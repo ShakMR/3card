@@ -1,3 +1,6 @@
+import sourceMapSupport from 'source-map-support';
+sourceMapSupport.install();
+
 const GameEngine = require("./gameEngine");
 const Player = require("./player/Player");
 const Deck = require("./deck/Deck");
@@ -10,7 +13,7 @@ const HANDS_CONFIG = require("./hand/config.json");
 const Terminal = require("./display/terminal");
 const CommandLineInput = require("./user_input/CommandLineInput");
 
-main = async () => {
+const main = async () => {
   const display = new Terminal();
   display.clear();
   const nPlayers = await utils.askUserForNumber("N Players?", 1, 2);
