@@ -1,4 +1,4 @@
-const Hand = require('./Hand');
+import Hand from './Hand'
 
 class SecretHand extends Hand {
   constructor() {
@@ -12,4 +12,4 @@ class SecretHand extends Hand {
   }
 }
 
-module.exports = SecretHand;
+export default SecretHand;

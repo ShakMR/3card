@@ -1,4 +1,4 @@
-const USER_ACTIONS = {
+export const USER_ACTIONS = {
   PLAY_CARDS: 'play',
   DISCARD_CARDS: 'discard',
   GET_ALL: 'getall',
@@ -10,6 +10,4 @@ class UserInput {
   whatToDoInTurn(){}
 }
 
-UserInput.USER_ACTIONS = USER_ACTIONS;
-
-module.exports = UserInput
+export default UserInput

@@ -1,4 +1,4 @@
-const Display = require('./Display');
+import Display from './Display'
 
 const styles = {
   reset: "\x1b[0m",
@@ -197,4 +197,4 @@ class Terminal extends Display {
   }
 }
 
-module.exports = Terminal;
+export default Terminal;

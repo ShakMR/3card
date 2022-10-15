@@ -1,5 +1,5 @@
-const terminal = require("../utils");
-const UserInput = require('./UserInput');
+import terminal from "../utils"
+import UserInput from './UserInput'
 
 const ACTION_KEYS = {
   GET: 'G',
@@ -100,4 +100,4 @@ class CommandLineInput extends UserInput {
   }
 }
 
-module.exports = CommandLineInput;
+export default CommandLineInput;

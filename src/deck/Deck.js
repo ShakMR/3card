@@ -1,5 +1,5 @@
-const Card = require('../card/Card');
-const deckConfig = require('./deck.json');
+import Card from '../card/Card'
+import deckConfig from './deck.json'
 
 function shuffle(array) {
   let currentIndex = array.length,  randomIndex;
@@ -40,4 +40,4 @@ class Deck {
   }
 }
 
-module.exports = Deck;
+export default Deck;

@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "prestart": "npm run build",
-    "start": "node dist/main.js",
+    "start": "npm-run-all --parallel build:watch run:watch",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "run:watch": "nodemon dist/main.js --watch dist"

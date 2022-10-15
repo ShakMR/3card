@@ -18,4 +18,4 @@ class Display {
   }
 }
 
-module.exports = Display;
+export default Display;

@@ -1,5 +1,5 @@
-const Hand = require('./Hand');
-const { cardComparisonFunction } = require('../card/Card');
+import Hand from './Hand'
+import { cardComparisonFunction } from '../card/Card'
 
 class PlayerHand extends Hand {
   constructor() {
@@ -28,4 +28,4 @@ class PlayerHand extends Hand {
   }
 }
 
-module.exports = PlayerHand;
+export default PlayerHand;

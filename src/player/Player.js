@@ -60,4 +60,4 @@ ${this.hands.map(h => h.toString()).join(' | ')}`;
   }
 }
 
-module.exports = Player;
+export default Player;

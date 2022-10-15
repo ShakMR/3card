@@ -1,4 +1,4 @@
-const readline = require('readline');
+import readline from 'readline'
 
 const terminal = readline.createInterface({
   input: process.stdin,
@@ -20,7 +20,7 @@ const askUserForNumber = async (question, rangeStart = null, rangeEnds = null) =
   return answer;
 }
 
-module.exports = {
+export default {
   askUser,
   askUserForNumber
 }

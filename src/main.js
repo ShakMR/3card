@@ -1,17 +1,17 @@
 import sourceMapSupport from 'source-map-support';
 sourceMapSupport.install();
 
-const GameEngine = require("./gameEngine");
-const Player = require("./player/Player");
-const Deck = require("./deck/Deck");
-const PlayerHand = require("./hand/PlayerHand");
-const SecretHand = require("./hand/SecretHand");
-const DefenseHand = require("./hand/DefenseHand");
-const Table = require("./table/Table");
-const utils = require("./utils");
-const HANDS_CONFIG = require("./hand/config.json");
-const Terminal = require("./display/terminal");
-const CommandLineInput = require("./user_input/CommandLineInput");
+import GameEngine from "./gameEngine"
+import Player from "./player/Player"
+import Deck from "./deck/Deck"
+import PlayerHand from "./hand/PlayerHand"
+import SecretHand from "./hand/SecretHand"
+import DefenseHand from "./hand/DefenseHand"
+import Table from "./table/Table"
+import utils from "./utils"
+import HANDS_CONFIG from "./hand/config.json"
+import Terminal from "./display/terminal"
+import CommandLineInput from "./user_input/CommandLineInput"
 
 const main = async () => {
   const display = new Terminal();

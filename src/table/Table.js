@@ -1,4 +1,4 @@
-const RESOLUTIONS = require('../resolutions');
+import RESOLUTIONS from '../resolutions'
 
 class Table {
   constructor() {
@@ -84,4 +84,4 @@ class Table {
   }
 }
 
-module.exports = Table;
+export default Table;

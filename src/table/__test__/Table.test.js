@@ -1,6 +1,6 @@
-const Table = require('../Table');
-const Card = require("../../card/Card");
-const RESOLUTIONS = require("../../resolutions");
+import Table from '../Table'
+import Card from "../../card/Card"
+import RESOLUTIONS from "../../resolutions"
 
 describe('Table', () => {
   /** @type Table */

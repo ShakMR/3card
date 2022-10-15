@@ -1,7 +1,10 @@
-const terminal = require("./utils");
-const RESOLUTIONS = require("./resolutions");
-const HANDS_CONFIG = require("./hand/config.json");
-const { USER_ACTIONS } = require("./user_input/UserInput");
+import { USER_ACTIONS } from "./user_input/UserInput";
+
+import RESOLUTIONS from "./resolutions";
+
+import terminal from "./utils";
+
+import HANDS_CONFIG from "./hand/config.json";
 
 /**
  * @typedef GameEngine
@@ -12,7 +15,7 @@ const { USER_ACTIONS } = require("./user_input/UserInput");
  * @property {UserInput} userInput
  */
 class GameEngine {
-  constructor({players, deck, table, display, userInput}) {
+  constructor({ players, deck, table, display, userInput }) {
     this.players = players;
     this.turn = 0;
     this.deck = deck;
@@ -224,10 +227,10 @@ class GameEngine {
   }
 
   endGame() {
-    while(1) {
+    while (1) {
       this.display.endGame(this.players[this.turn]);
     }
   }
 }
 
-module.exports = GameEngine;
+export default GameEngine;

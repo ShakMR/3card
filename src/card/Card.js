@@ -1,6 +1,6 @@
-const rules = require('./cardRules');
-const symbolMap = require('./cardSymbolMap.json');
-const suitSymbolMap = require('./suitSymbolMap.json');
+import rules from './cardRules'
+import symbolMap from './cardSymbolMap.json'
+import suitSymbolMap from './suitSymbolMap.json'
 
 class Card {
   constructor(number, suit) {
@@ -42,6 +42,6 @@ class Card {
 
 }
 
-Card.cardComparisonFunction = () => (cardA, cardB) => cardA.number - cardB.number;
+export const cardComparisonFunction = () => (cardA, cardB) => cardA.number - cardB.number;
 
-module.exports = Card;
+export default Card;

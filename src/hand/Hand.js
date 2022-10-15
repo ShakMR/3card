@@ -63,4 +63,4 @@ class Hand {
   }
 }
 
-module.exports = Hand;
+export default Hand;
