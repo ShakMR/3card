@@ -1,7 +1,6 @@
 import Card from '../card/Card'
-import deckConfig from './deck.json'
 
-function shuffle(array) {
+function shuffle<T extends unknown>(array: T[]) {
   let currentIndex = array.length,  randomIndex;
 
   // While there remain elements to shuffle.
@@ -19,16 +18,21 @@ function shuffle(array) {
   return array;
 }
 
-class Deck {
-  constructor() {
-    this.cards = [];
+export type DeckConfig = Record<string, number[]>;
+
+class Deck<C extends Card> {
+  cards: C[] = [];
+  deckDefinition: DeckConfig
+
+  constructor(deckDefinition: DeckConfig) {
+    this.deckDefinition = deckDefinition;
   }
 
-  init() {
-    const tempDeck = []
-    Object.entries(deckConfig).forEach(([suit, numbers]) => {
-      numbers.forEach((number) => {
-        tempDeck.push(new Card(number, suit));
+  init(c: new (...args: any) => C) {
+    const tempDeck: C[] = []
+    Object.entries(this.deckDefinition).forEach(([suit, numbers]) => {
+      numbers.forEach((number: number) => {
+        tempDeck.push(new c(number, suit));
       });
     });
 

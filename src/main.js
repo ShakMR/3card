@@ -3,7 +3,6 @@ sourceMapSupport.install();
 
 import GameEngine from "./gameEngine"
 import Player from "./player/Player"
-import Deck from "./deck/Deck"
 import PlayerHand from "./hand/PlayerHand"
 import SecretHand from "./hand/SecretHand"
 import DefenseHand from "./hand/DefenseHand"
@@ -12,6 +11,7 @@ import utils from "./utils"
 import HANDS_CONFIG from "./hand/config.json"
 import Terminal from "./display/terminal"
 import CommandLineInput from "./user_input/CommandLineInput"
+import PokerDeck from "./deck/PokerDeck";
 
 const main = async () => {
   const display = new Terminal();
@@ -26,7 +26,7 @@ const main = async () => {
     p.setHand(HANDS_CONFIG.SECRET.priority, new SecretHand());
     players.push(p);
   }
-  const deck = new Deck();
+  const deck = new PokerDeck();
   deck.init();
   const table = new Table();
   const userInput = new CommandLineInput();
