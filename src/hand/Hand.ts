@@ -1,12 +1,30 @@
+import Card from "../card/Card";
+
+type HandProps = {
+  cards?: Card[];
+  limit?: number;
+  visible?: boolean;
+  canPlayMultiple?: boolean;
+  returnOnFail?: boolean;
+  priority: number;
+}
+
 class Hand {
+  cards: Card[];
+  limit?: number;
+  visible: boolean;
+  canPlayMultiple: boolean;
+  returnOnFail: boolean;
+  priority: number;
+
   constructor({
     cards = [],
-    limit = null,
+    limit,
     visible = true,
     canPlayMultiple = true,
     returnOnFail = false,
     priority,
-  }) {
+  }: HandProps) {
     this.cards = cards;
     this.limit = limit;
     this.visible = visible;
@@ -20,42 +38,30 @@ class Hand {
   }
 
   isLimitReached() {
-    return this.limit <= this.cards.length;
+    return this.limit && this.limit <= this.cards.length;
   }
 
-  getCard(index) {
+  getCard(index: number) {
     if (this.visible) {
       return this.cards[index];
     }
   }
 
-  addCard(card) {
+  addCard(card: Card) {
     if (!this.limit || this.limit >= this.cards.length) {
       this.cards.push(card);
-      return this.cards.length - this.limit;
+      return this.cards.length - (this.limit || 0);
     } else {
       throw new Error("Cannot add more cards");
     }
   }
 
-  /**
-   *
-   * @param {number[]} indexes
-   * @returns {Card[]}
-   */
-  playCard(indexes) {
+  playCard(indexes: number[]) {
     return indexes.reverse().map((index) => this.cards.splice(index, 1)[0])
   }
 
   isEmpty() {
     return this.cards.length === 0;
-  }
-
-  show() {
-    this.cards.forEach((c, index) => {
-      console.log(index, "-----");
-      c.show();
-    })
   }
 
   toString() {

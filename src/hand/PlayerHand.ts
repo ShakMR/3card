@@ -1,7 +1,9 @@
 import Hand from './Hand'
-import { cardComparisonFunction } from '../card/Card'
+import Card, { cardComparisonFunction } from '../card/Card'
 
 class PlayerHand extends Hand {
+  shouldHaveCards: number;
+
   constructor() {
     super({
       priority: 1,
@@ -20,11 +22,11 @@ class PlayerHand extends Hand {
   }
 
   sort() {
-    this.cards.sort(cardComparisonFunction());
+    this.cards.sort(cardComparisonFunction);
   }
 
-  addCard(card) {
-    this.cards.push(card);
+  addCard(card: Card) {
+    return this.cards.push(card);
   }
 }
 

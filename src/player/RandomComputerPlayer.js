@@ -1,3 +1,0 @@
-class RandomComputerPlayer extends Player {
-  
-}

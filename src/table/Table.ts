@@ -1,10 +1,9 @@
-import RESOLUTIONS from '../resolutions'
+import { resolutions } from '../resolutions'
+import Card from "../card/Card";
 
 class Table {
-  constructor() {
-    this.gameStack = [];
-    this.discardStack = [];
-  }
+  gameStack: Card[] = [];
+  discardStack: Card[] = [];
 
   topCard() {
     return this.gameStack[0];
@@ -12,15 +11,15 @@ class Table {
 
   eatStack() {
     while (this.gameStack[0] && this.gameStack[0].number === 3) {
-      const card = this.gameStack.splice(0,1);
+      const [card] = this.gameStack.splice(0,1);
       this.discardStack.push(card);
     }
     return this.gameStack.splice(0);
   }
 
-  playCard(cards) {
+  playCard(cards: Card[]) {
     const resolution = this.resolve(cards);
-    if (![RESOLUTIONS.NOPE, RESOLUTIONS.SAME].includes(resolution)) {
+    if (![resolutions.NOPE, resolutions.SAME].includes(resolution)) {
       this.gameStack.splice(0,0, ...cards);
     }
     return resolution;
@@ -31,43 +30,35 @@ class Table {
     this.gameStack = [];
   }
 
-  show() {
-    if (this.gameStack.length > 1) {
-      this.gameStack[0].show();
-    } else {
-      console.log("EMPTY");
-    }
-  }
-
-  resolve(cards) {
+  resolve(cards: Card[]) {
     const currentCard = this.gameStack[0];
     const topPlayedCards = cards[0];
     const canBePlayed = currentCard ? topPlayedCards.canBePlayedAfter(currentCard.number) : true;
     if (!canBePlayed) {
-      return RESOLUTIONS.NOPE;
+      return resolutions.NOPE;
     }
 
     if (topPlayedCards.number === 10) {
       this.discardStack.push(...cards);
       this.discardGameCards();
-      return RESOLUTIONS.SAME;
+      return resolutions.SAME;
     }
 
     if (this.canDiscard(cards)) {
       const nToDiscardFromStack = 4 - cards.length;
       const cardsFromStack = this.gameStack.splice(0, nToDiscardFromStack);
       this.discardStack.push(...cardsFromStack, ...cards);
-      return RESOLUTIONS.SAME;
+      return resolutions.SAME;
     }
 
     if (currentCard && cards[0].number === currentCard.number) {
-      return RESOLUTIONS.JUMP;
+      return resolutions.JUMP;
     }
 
-    return RESOLUTIONS.NEXT;
+    return resolutions.NEXT;
   }
 
-  canDiscard(cards) {
+  canDiscard(cards: Card[]) {
     const nPlayedCards = cards.length;
     const playedCardNumber = cards[0].number;
     let equalValue = true;
@@ -79,7 +70,7 @@ class Table {
     return equalValue;
   }
 
-  discardCards(cards) {
+  discardCards(cards: Card[]) {
     this.discardStack.push(...cards);
   }
 }
