@@ -8,7 +8,7 @@ import SecretHand from "./hand/SecretHand"
 import DefenseHand from "./hand/DefenseHand"
 import Table from "./table/Table"
 import utils from "./utils"
-import HANDS_CONFIG from "./hand/config.json"
+import HANDS_CONFIG from "./hand/config"
 import Terminal from "./display/terminal"
 import CommandLineInput from "./user_input/CommandLineInput"
 import PokerDeck from "./deck/PokerDeck";

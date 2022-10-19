@@ -1,18 +1,21 @@
 import Player from "../player/Player";
 import Table from "../table/Table";
 import Deck from "../deck/Deck";
-import Card from "../card/Card";
 
-export type Status<C extends Card> = {
+export type Status = {
   turn: number,
   players: Player[];
   table: Table,
-  deck: Deck<C>,
+  deck: Deck,
   hidden: boolean,
 }
 
 abstract class Display {
-  abstract displayCurrentPlayerStatus<C extends Card>({ turn, players, table, deck, hidden }: Status<C>): void;
+  abstract displayCurrentPlayerStatus({ turn, players, table, deck, hidden }: Status): void;
+
+  abstract showMessage(messages: string[]): void;
+
+  abstract clear(): void;
 
   abstract endGame(winner: Player): void;
 }

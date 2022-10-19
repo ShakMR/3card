@@ -1,31 +1,41 @@
-import { USER_ACTIONS } from "./user_input/UserInput";
+import UserInput, { USER_ACTIONS } from "./user_input/UserInput";
 
-import RESOLUTIONS from "./resolutions";
+import { Resolutions } from "./resolutions";
 
 import terminal from "./utils";
 
-import HANDS_CONFIG from "./hand/config.json";
+import HANDS_CONFIG, { HandConfig } from "./hand/config";
+import Deck from "./deck/Deck";
+import Player from "./player/Player";
+import Table from "./table/Table";
+import Display from "./display/Display";
 
-/**
- * @typedef GameEngine
- * @property {Player[]} players
- * @property {Deck[]} deck
- * @property {Table[]} table
- * @property {Display[]} display
- * @property {UserInput} userInput
- */
+type GameEngineParams = {
+  players: Player[],
+  deck: Deck,
+  table: Table,
+  display: Display,
+  userInput: UserInput,
+}
+
 class GameEngine {
-  constructor({ players, deck, table, display, userInput }) {
+  players: Player[];
+  turn: number = 0;
+  deck: Deck;
+  table: Table;
+  display: Display;
+  message: string[] = [];
+  userInput: UserInput;
+
+  constructor({ players, deck, table, display, userInput }: GameEngineParams) {
     this.players = players;
-    this.turn = 0;
     this.deck = deck;
     this.table = table;
     this.display = display;
-    this.message = [];
     this.userInput = userInput;
   }
 
-  _dealHands(handConfig) {
+  _dealHands(handConfig: HandConfig) {
     for (let i = 0; i < (handConfig.limit || 3); i++) {
       while (this.turn < this.players.length) {
         const card = this.deck.pickCard();
@@ -64,14 +74,14 @@ class GameEngine {
               await this.whatToPlay();
               break;
             case USER_ACTIONS.SORT_HAND:
-              resolution = RESOLUTIONS.SAME;
+              resolution = Resolutions.SAME;
               currentPlayer.getPlayerHand().sort();
               break;
             case USER_ACTIONS.DISCARD_CARDS:
               this.discardCards(currentPlayer, action.data.cardIndexes);
               break;
             default:
-              this.message(`Unknown user action ${action}`);
+              this.addMessage(`Unknown user action ${action}`);
           }
         }
         this.nextPlayer(resolution);
@@ -81,20 +91,14 @@ class GameEngine {
     }
   }
 
-  /**
-   *
-   * @param {Player} player
-   * @param {number[]} cardIndexes
-   * @returns {Promise<string|*>}
-   */
-  async play(player, cardIndexes) {
+  async play(player: Player, cardIndexes: number[]): Promise<Resolutions> {
     const cards = player.playCard({ cardIndexes });
     if (!cards) {
       throw new Error(`Unreachable code, invalid card indexes: ${cardIndexes}`);
     }
 
     const resolution = this.table.playCard(cards);
-    if (resolution === RESOLUTIONS.NOPE) {
+    if (resolution === Resolutions.NOPE) {
       this.addMessage("You cannot play that card");
 
       for (let card of cards) {
@@ -105,16 +109,16 @@ class GameEngine {
     }
 
     if (!player.getActiveHand()) {
-      return RESOLUTIONS.END;
+      return Resolutions.END;
     }
     return resolution;
   }
 
-  eatAll(player) {
+  eatAll(player: Player): Resolutions {
     this.addMessage(`${player.name} cannot play should take all card.`);
     const stack = this.table.eatStack();
     stack.forEach(c => player.returnCard(c));
-    return RESOLUTIONS.NEXT;
+    return Resolutions.NEXT;
   }
 
   async whatToPlay() {
@@ -122,11 +126,11 @@ class GameEngine {
     if (!topCard) {
       this.addMessage("Anything");
     } else {
-      this.addMessage(topCard.getValidNext());
+      this.addMessage(`${topCard.getValidNext()}`);
     }
   }
 
-  nextPlayerIndex(howMany) {
+  nextPlayerIndex(howMany: number): number {
     let turn = this.turn + howMany;
     if (turn >= this.players.length) {
       turn = turn % this.players.length;
@@ -134,8 +138,8 @@ class GameEngine {
     return turn;
   }
 
-  nextPlayer(resolution, card) {
-    const next = (howMany = 1, draw) => {
+  nextPlayer(resolution: Resolutions) {
+    const next = (howMany = 1, draw: boolean) => {
       this.addMessage(`Next Player - ${this.players[this.nextPlayerIndex(nextJump)].name}`);
       if (draw) {
         this.drawCardPlayer();
@@ -145,36 +149,34 @@ class GameEngine {
     let nextJump = 1;
     let draw = true;
     switch (resolution) {
-      case RESOLUTIONS.JUMP:
+      case Resolutions.JUMP:
         if (this.players.length > 2) {
           this.addMessage(`${this.players[this.nextPlayerIndex(1)].name} has been skipped`);
           nextJump = 2;
         }
         break;
-      case RESOLUTIONS.SAME:
+      case Resolutions.SAME:
         this.addMessage(`${this.players[this.turn].name} plays again`);
         nextJump = 0;
         break;
-      case RESOLUTIONS.NEXT:
+      case Resolutions.NEXT:
         break;
-      case RESOLUTIONS.NOPE:
+      case Resolutions.NOPE:
         draw = false;
         this.addMessage("Repeat");
         nextJump = 0;
         break;
-      case RESOLUTIONS.END:
+      case Resolutions.END:
         this.endGame();
         return process.exit(0);
       default:
-        throw new Error("Unreachable code", resolution);
+        throw new Error(`Unreachable code ${resolution}`);
     }
     next(nextJump, draw);
   }
 
   drawCardPlayer() {
-    /** @type Player */
     const currentPlayer = this.players[this.turn];
-    /** @type PlayerHand */
     const hand = currentPlayer.getPlayerHand();
     if (hand.hasEnoughCards() || this.deck.cards.length === 0) {
       return;
@@ -203,7 +205,7 @@ class GameEngine {
     this.display.clear();
   }
 
-  addMessage(msg) {
+  addMessage(msg: string) {
     this.message.push(msg);
   }
 
@@ -211,19 +213,19 @@ class GameEngine {
     await terminal.askUser("Press ENTER to continue");
   }
 
-  async cannotPlay(currentPlayer) {
+  async cannotPlay(currentPlayer: Player) {
     this.addMessage(`Player ${currentPlayer.name} cannot play any card`);
     this.showStatus();
     await this.waitForUser();
     this.eatAll(currentPlayer);
-    this.nextPlayer(RESOLUTIONS.NEXT);
+    this.nextPlayer(Resolutions.NEXT);
   }
 
-  discardCards(currentPlayer, cardIndexes) {
+  discardCards(currentPlayer: Player, cardIndexes: number[]) {
     const cards = currentPlayer.playCard({ cardIndexes });
     this.addMessage(`Player ${currentPlayer.name} discarded ${cards.length} cards with number ${cards[0].number}`);
     this.table.discardCards(cards);
-    return RESOLUTIONS.SAME;
+    return Resolutions.SAME;
   }
 
   endGame() {

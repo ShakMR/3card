@@ -1,4 +1,4 @@
-import { resolutions } from '../resolutions'
+import { Resolutions } from '../resolutions';
 import Card from "../card/Card";
 
 class Table {
@@ -19,7 +19,7 @@ class Table {
 
   playCard(cards: Card[]) {
     const resolution = this.resolve(cards);
-    if (![resolutions.NOPE, resolutions.SAME].includes(resolution)) {
+    if (![Resolutions.NOPE, Resolutions.SAME].includes(resolution)) {
       this.gameStack.splice(0,0, ...cards);
     }
     return resolution;
@@ -35,27 +35,27 @@ class Table {
     const topPlayedCards = cards[0];
     const canBePlayed = currentCard ? topPlayedCards.canBePlayedAfter(currentCard.number) : true;
     if (!canBePlayed) {
-      return resolutions.NOPE;
+      return Resolutions.NOPE;
     }
 
     if (topPlayedCards.number === 10) {
       this.discardStack.push(...cards);
       this.discardGameCards();
-      return resolutions.SAME;
+      return Resolutions.SAME;
     }
 
     if (this.canDiscard(cards)) {
       const nToDiscardFromStack = 4 - cards.length;
       const cardsFromStack = this.gameStack.splice(0, nToDiscardFromStack);
       this.discardStack.push(...cardsFromStack, ...cards);
-      return resolutions.SAME;
+      return Resolutions.SAME;
     }
 
     if (currentCard && cards[0].number === currentCard.number) {
-      return resolutions.JUMP;
+      return Resolutions.JUMP;
     }
 
-    return resolutions.NEXT;
+    return Resolutions.NEXT;
   }
 
   canDiscard(cards: Card[]) {

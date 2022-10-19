@@ -86,8 +86,9 @@ const handCardsHorizontal = ({
     hands,
     reverse = false,
     showPlayerHand = false
-}: { hands: Hand[], reverse?: boolean, showPlayerHand?: boolean }) => {
-    const display = hands.filter((hand) => hand).map((hand, index) => {
+}: { hands: Array<Hand | null>, reverse?: boolean, showPlayerHand?: boolean }) => {
+    const display = hands.filter((hand: Hand | null) => hand).map((hand: Hand | null, index: number) => {
+        if (!hand) return;
         const shouldCardBeVisible = hand.visible && (index !== 0 || showPlayerHand);
         const handsSymbols = hand.cards.map((c) => cardSymbolLine({card: c, visible: shouldCardBeVisible})).join("  ");
         const handsSuits = hand.cards.map((c) => cardSuitsLine({card: c, visible: shouldCardBeVisible})).join("  ");
@@ -117,7 +118,7 @@ const tableTopCardSuit = (card: Card) => {
 };
 
 
-function onePlayerTable<C extends Card>({table, players, turn, deck}: Status<C>): void {
+function onePlayerTable<C extends Card>({table, players, turn, deck}: Status): void {
     const topCard = table.topCard();
     const hands = players[turn].getAllHands();
 
@@ -135,7 +136,7 @@ ${handsDisplay.join("")}
 `);
 }
 
-function twoPlayerTable<C extends Card>({table, players, turn, deck, hidden = false}: Status<C>): void {
+function twoPlayerTable<C extends Card>({table, players, turn, deck, hidden = false}: Status): void {
     const topCard = table.topCard();
     const playingNow = players[turn];
     const contrary = players[(turn + 1) % players.length];
@@ -171,7 +172,7 @@ class Terminal extends Display {
         super();
     }
 
-    displayCurrentPlayerStatus<C extends Card>(status: Status<C>) {
+    displayCurrentPlayerStatus<C extends Card>(status: Status) {
         const nPlayers = status.players.length;
 
         const funct = tableDisplayFuncs[nPlayers];

@@ -8,13 +8,13 @@ const config: DeckConfig = {
     [Suit.D]: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 };
 
-class PokerDeck extends Deck<PokerCard> {
+class PokerDeck extends Deck {
     constructor() {
         super(config);
     }
 
     init() {
-        super.init(PokerCard);
+        super.init((number: number, suit: Suit) => new PokerCard(number, suit));
     }
 }
 

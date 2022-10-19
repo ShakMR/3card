@@ -1,5 +1,5 @@
 import Table from "../Table";
-import { resolutions } from "../../resolutions";
+import { Resolutions } from "../../resolutions";
 import PokerCard, { Suit } from "../../card/PokerCard";
 
 describe('Table', () => {
@@ -20,27 +20,27 @@ describe('Table', () => {
     const card = new PokerCard(number, Suit.C);
     const resolution = table.playCard([card]);
 
-    expect(resolution).toBe(resolutions.NEXT);
+    expect(resolution).toBe(Resolutions.NEXT);
   });
 
   test.each([
-    [1, resolutions.JUMP],
-    [2, resolutions.NEXT],
-    [3, resolutions.NEXT],
-    [4, resolutions.NOPE],
-    [5, resolutions.NOPE],
-    [6, resolutions.NOPE],
-    [7, resolutions.NOPE],
-    [8, resolutions.NOPE],
-    [9, resolutions.NOPE],
-    [10, resolutions.SAME],
-    [11, resolutions.NOPE],
-    [12, resolutions.NOPE],
-    [13, resolutions.NOPE]
+    [1, Resolutions.JUMP],
+    [2, Resolutions.NEXT],
+    [3, Resolutions.NEXT],
+    [4, Resolutions.NOPE],
+    [5, Resolutions.NOPE],
+    [6, Resolutions.NOPE],
+    [7, Resolutions.NOPE],
+    [8, Resolutions.NOPE],
+    [9, Resolutions.NOPE],
+    [10, Resolutions.SAME],
+    [11, Resolutions.NOPE],
+    [12, Resolutions.NOPE],
+    [13, Resolutions.NOPE]
   ])('should allow to play %d on top of 1? %s', (number, expected) => {
 
     const previousCard = new PokerCard(1, Suit.H);
-    expect(table.playCard([previousCard])).toBe(resolutions.NEXT);
+    expect(table.playCard([previousCard])).toBe(Resolutions.NEXT);
 
     const card = new PokerCard(number, Suit.S);
     const resolution = table.playCard([card]);
@@ -56,7 +56,7 @@ describe('Table', () => {
 
     const resolution = table.playCard([new PokerCard(1, Suit.H)]);
 
-    expect(resolution).toBe(resolutions.SAME);
+    expect(resolution).toBe(Resolutions.SAME);
     expect(table.discardStack).toHaveLength(4);
     expect(table.gameStack).toHaveLength(0);
   })

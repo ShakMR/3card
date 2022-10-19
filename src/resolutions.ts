@@ -1,4 +1,4 @@
-export enum resolutions {
+export enum Resolutions {
   SAME = 'same',
   JUMP = 'jump',
   NOPE = 'nope',

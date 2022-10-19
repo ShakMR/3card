@@ -20,19 +20,19 @@ function shuffle<T extends unknown>(array: T[]) {
 
 export type DeckConfig = Record<string, number[]>;
 
-class Deck<C extends Card> {
-  cards: C[] = [];
+class Deck {
+  cards: Card[] = [];
   deckDefinition: DeckConfig
 
   constructor(deckDefinition: DeckConfig) {
     this.deckDefinition = deckDefinition;
   }
 
-  init(c: new (...args: any) => C) {
-    const tempDeck: C[] = []
+  init(createCardInstante: (...args: any) => Card) {
+    const tempDeck: Card[] = []
     Object.entries(this.deckDefinition).forEach(([suit, numbers]) => {
       numbers.forEach((number: number) => {
-        tempDeck.push(new c(number, suit));
+        tempDeck.push(createCardInstante(number, suit));
       });
     });
 
