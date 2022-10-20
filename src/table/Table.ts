@@ -30,7 +30,7 @@ class Table {
     this.discardStack.push(...this.gameStack)
     this.gameStack = [];
   }
-
+  
   discardCards(cards: Card[]) {
     this.discardStack.push(...cards);
   }

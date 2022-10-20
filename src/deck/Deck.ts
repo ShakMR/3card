@@ -40,7 +40,7 @@ class Deck {
   }
 
   pickCard() {
-    return this.cards.splice(0, 1)[0];
+    return this.cards.pop();
   }
 }
 
