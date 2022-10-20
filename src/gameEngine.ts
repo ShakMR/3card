@@ -9,6 +9,7 @@ import Deck from "./deck/Deck";
 import Player from "./player/Player";
 import Table from "./table/Table";
 import Display from "./display/Display";
+import { tableRules } from "./game_rules/trix";
 
 type GameEngineParams = {
   players: Player[],
@@ -56,39 +57,43 @@ class GameEngine {
     while (true) {
       this.showStatus();
       const currentPlayer = this.players[this.turn];
-      const currentTopCard = this.table.topCard();
-      if (currentTopCard && !currentPlayer.canPlaySomething(currentTopCard.number)) {
+      if (!tableRules.canPlaySomething(this.table, currentPlayer)) {
         await this.cannotPlay(currentPlayer);
       } else {
-        let resolution;
-        while (!resolution) {
-          const action = await this.userInput.whatToDoInTurn(currentPlayer);
-          switch (action.type) {
-            case USER_ACTIONS.PLAY_CARDS:
-              resolution = await this.play(currentPlayer, action.data.cardIndexes);
-              break;
-            case USER_ACTIONS.GET_ALL:
-              resolution = this.eatAll(currentPlayer);
-              break;
-            case USER_ACTIONS.WHAT_TO_PLAY:
-              await this.whatToPlay();
-              break;
-            case USER_ACTIONS.SORT_HAND:
-              resolution = Resolutions.SAME;
-              currentPlayer.getPlayerHand().sort();
-              break;
-            case USER_ACTIONS.DISCARD_CARDS:
-              this.discardCards(currentPlayer, action.data.cardIndexes);
-              break;
-            default:
-              this.addMessage(`Unknown user action ${action}`);
-          }
-        }
+        const resolution = await this.playTurn(currentPlayer);
         this.nextPlayer(resolution);
         this.showStatus({ hidden: true });
         await this.waitForUser();
       }
     }
+  }
+
+  async playTurn(currentPlayer: Player) {
+    let resolution;
+    while (!resolution) {
+      const action = await this.userInput.whatToDoInTurn(currentPlayer);
+      switch (action.type) {
+        case USER_ACTIONS.PLAY_CARDS:
+          resolution = await this.play(currentPlayer, action.data.cardIndexes);
+          break;
+        case USER_ACTIONS.GET_ALL:
+          resolution = this.eatAll(currentPlayer);
+          break;
+        case USER_ACTIONS.WHAT_TO_PLAY:
+          await this.whatToPlay();
+          break;
+        case USER_ACTIONS.SORT_HAND:
+          resolution = Resolutions.SAME;
+          currentPlayer.getPlayerHand().sort();
+          break;
+        case USER_ACTIONS.DISCARD_CARDS:
+          this.discardCards(currentPlayer, action.data.cardIndexes);
+          break;
+        default:
+          this.addMessage(`Unknown user action ${action}`);
+      }
+    }
+    return resolution;
   }
 
   async play(player: Player, cardIndexes: number[]): Promise<Resolutions> {
@@ -97,7 +102,7 @@ class GameEngine {
       throw new Error(`Unreachable code, invalid card indexes: ${cardIndexes}`);
     }
 
-    const resolution = this.table.playCard(cards);
+    const { resolution, additionalData } = tableRules.resolveAction(this.table, cards);
     if (resolution === Resolutions.NOPE) {
       this.addMessage("You cannot play that card");
 
@@ -108,15 +113,36 @@ class GameEngine {
       this.addMessage(`${player.name} played ${cards}`);
     }
 
-    if (!player.getActiveHand()) {
-      return Resolutions.END;
+    if (additionalData) {
+      const { discardPlayed, discardStack, cardsToDiscard, playCards } = additionalData;
+
+      if (discardPlayed) {
+        this.table.discardCards(cards);
+      }
+
+      if (discardStack) {
+        this.table.discardGameCards();
+      }
+
+      if (cardsToDiscard && cardsToDiscard > 0) {
+        this.table.discardCardsFromStack(cardsToDiscard);
+      }
+
+      if (!player.getActiveHand()) {
+        return Resolutions.END;
+      }
+
+      if (playCards) {
+        this.table.playCards(cards)
+      }
     }
+
     return resolution;
   }
 
   eatAll(player: Player): Resolutions {
     this.addMessage(`${player.name} cannot play should take all card.`);
-    const stack = this.table.eatStack();
+    const stack = this.table.getStack();
     stack.forEach(c => player.returnCard(c));
     return Resolutions.NEXT;
   }
@@ -229,9 +255,7 @@ class GameEngine {
   }
 
   endGame() {
-    while (1) {
-      this.display.endGame(this.players[this.turn]);
-    }
+    this.display.endGame(this.players[this.turn]);
   }
 }
 

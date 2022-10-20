@@ -2,7 +2,7 @@
 
 This list might not shrink but grow over time instead :D
 
-- [ ] Move everything to TS
-- [ ] Implement simple IA
+- [x] Move everything to TS
 - [ ] Move all game rules out of Game objects (Card, Deck, etc)
+- [ ] Implement simple IA
 - [ ] Implement first turn Defense and Player hands exchange.

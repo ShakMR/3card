@@ -1,6 +1,3 @@
-import * as rules from './cardRules'
-
-
 abstract class Card {
   number: number;
   suit: string;
@@ -12,18 +9,6 @@ abstract class Card {
 
   abstract get symbol(): string | number;
   abstract get suitSymbol(): string;
-
-  canBePlayedAfter(number: number) {
-    return rules.canPlayXAfterAnyOfY[this.number].includes(number);
-  }
-
-  getValidNext() {
-    return rules.afterXCanPlayAnyOf[this.number];
-  }
-
-  toString() {
-    return `${this.number}-${this.suit}`;
-  }
 
   valueOf() {
     return this.number;
