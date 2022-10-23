@@ -43,9 +43,11 @@ abstract class Player {
     return hand;
   }
 
-  /**
-   * @returns {Hand}
-   */
+  hasFinished() {
+    const hand = this.hands.find((h) => h && h.cards.length > 0);
+    return !hand;
+  }
+
   getActiveHand() {
     const hand = this.hands.find((h) => h && h.cards.length > 0);
     if (!hand) {

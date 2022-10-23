@@ -1,5 +1,5 @@
 import Player, { PlayerAction } from "./Player";
-import UserInput, { ActionData, USER_ACTIONS } from "../user_input/UserInput";
+import UserInput, { USER_ACTIONS } from "../user_input/UserInput";
 import { VisibleTable } from "../table/visibleTable";
 import { VisiblePlayers } from "./visiblePlayers";
 import { CardRules } from "../game_rules/trix";

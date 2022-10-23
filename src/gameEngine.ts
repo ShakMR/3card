@@ -134,7 +134,7 @@ class GameEngine {
         this.table.discardCardsFromStack(cardsToDiscard);
       }
 
-      if (!player.getActiveHand()) {
+      if (!player.hasFinished()) {
         return Resolutions.END;
       }
 
