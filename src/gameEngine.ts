@@ -1,6 +1,8 @@
 import UserInput, { USER_ACTIONS } from "./user_input/UserInput";
 
 import { Resolutions } from "./resolutions";
+import createVisiblePlayers from "./player/visiblePlayers";
+import createVisibleTable from "./table/visibleTable";
 
 import terminal from "./utils";
 
@@ -9,14 +11,13 @@ import Deck from "./deck/Deck";
 import Player from "./player/Player";
 import Table from "./table/Table";
 import Display from "./display/Display";
-import { tableRules } from "./game_rules/trix";
+import { cardRules, tableRules } from "./game_rules/trix";
 
 type GameEngineParams = {
   players: Player[],
   deck: Deck,
   table: Table,
   display: Display,
-  userInput: UserInput,
 }
 
 class GameEngine {
@@ -26,21 +27,23 @@ class GameEngine {
   table: Table;
   display: Display;
   message: string[] = [];
-  userInput: UserInput;
 
-  constructor({ players, deck, table, display, userInput }: GameEngineParams) {
+  constructor({ players, deck, table, display }: GameEngineParams) {
     this.players = players;
     this.deck = deck;
     this.table = table;
     this.display = display;
-    this.userInput = userInput;
   }
 
   _dealHands(handConfig: HandConfig) {
     for (let i = 0; i < (handConfig.limit || 3); i++) {
       while (this.turn < this.players.length) {
         const card = this.deck.pickCard();
-        this.players[this.turn].addCard(card, handConfig.priority);
+        const player = this.players[this.turn];
+        if (!card) {
+          throw new Error(`There should be enough cards when dealing ${handConfig.type}, ${player.name}`)
+        }
+        player.addCard(card, handConfig.priority);
         this.turn++;
       }
       this.turn = 0;
@@ -70,24 +73,27 @@ class GameEngine {
 
   async playTurn(currentPlayer: Player) {
     let resolution;
+    const visibleTable = createVisibleTable(this.table);
+    const visiblePlayers = createVisiblePlayers(this.players, this.turn)
     while (!resolution) {
-      const action = await this.userInput.whatToDoInTurn(currentPlayer);
-      switch (action.type) {
+      const { action, data } = await currentPlayer.play(visibleTable, visiblePlayers, cardRules, this.deck.cards.length)
+      switch (action) {
         case USER_ACTIONS.PLAY_CARDS:
-          resolution = await this.play(currentPlayer, action.data.cardIndexes);
+          resolution = await this.play(currentPlayer, data!.cardIndexes!);
           break;
         case USER_ACTIONS.GET_ALL:
           resolution = this.eatAll(currentPlayer);
           break;
         case USER_ACTIONS.WHAT_TO_PLAY:
           await this.whatToPlay();
+          resolution = Resolutions.SAME;
           break;
         case USER_ACTIONS.SORT_HAND:
           resolution = Resolutions.SAME;
           currentPlayer.getPlayerHand().sort();
           break;
         case USER_ACTIONS.DISCARD_CARDS:
-          this.discardCards(currentPlayer, action.data.cardIndexes);
+          this.discardCards(currentPlayer, data!.cardIndexes!);
           break;
         default:
           this.addMessage(`Unknown user action ${action}`);
@@ -97,7 +103,7 @@ class GameEngine {
   }
 
   async play(player: Player, cardIndexes: number[]): Promise<Resolutions> {
-    const cards = player.playCard({ cardIndexes });
+    const cards = player.getCards({ cardIndexes });
     if (!cards) {
       throw new Error(`Unreachable code, invalid card indexes: ${cardIndexes}`);
     }
@@ -152,7 +158,7 @@ class GameEngine {
     if (!topCard) {
       this.addMessage("Anything");
     } else {
-      this.addMessage(`${topCard.getValidNext()}`);
+      this.addMessage(`${cardRules.getValidCardsAfter(topCard)}`);
     }
   }
 
@@ -248,7 +254,7 @@ class GameEngine {
   }
 
   discardCards(currentPlayer: Player, cardIndexes: number[]) {
-    const cards = currentPlayer.playCard({ cardIndexes });
+    const cards = currentPlayer.getCards({ cardIndexes });
     this.addMessage(`Player ${currentPlayer.name} discarded ${cards.length} cards with number ${cards[0].number}`);
     this.table.discardCards(cards);
     return Resolutions.SAME;

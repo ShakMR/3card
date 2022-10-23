@@ -1,4 +1,3 @@
-import { Resolutions } from '../resolutions';
 import Card from "../card/Card";
 
 class Table {
@@ -30,7 +29,7 @@ class Table {
     this.discardStack.push(...this.gameStack)
     this.gameStack = [];
   }
-  
+
   discardCards(cards: Card[]) {
     this.discardStack.push(...cards);
   }

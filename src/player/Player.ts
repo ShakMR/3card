@@ -3,8 +3,19 @@ import SecretHand from "../hand/SecretHand";
 import PlayerHand from "../hand/PlayerHand";
 import Hand from "../hand/Hand";
 import Card from "../card/Card";
+import { USER_ACTIONS } from "../user_input/UserInput";
+import { CardRules, TableRules } from "../game_rules/trix";
+import { VisiblePlayers } from "./visiblePlayers";
+import { VisibleTable } from "../table/visibleTable";
 
-class Player {
+export type PlayerAction = {
+  action: USER_ACTIONS | "Error",
+  data?: {
+    cardIndexes?: number[],
+  }
+}
+
+abstract class Player {
   name: string
   handPriority: number;
   hands: [PlayerHand | null, DefenseHand | null, SecretHand | null];
@@ -38,6 +49,7 @@ class Player {
   getActiveHand() {
     const hand = this.hands.find((h) => h && h.cards.length > 0);
     if (!hand) {
+      console.error(this.hands);
       throw new Error("Shouldn't be here. No active hand found");
     }
     return hand;
@@ -51,11 +63,7 @@ class Player {
     this.hands[priority] = hand;
   }
 
-  canPlaySomething(number: number) {
-    return this.getActiveHand().cards.some((c) => c.canBePlayedAfter(number));
-  }
-
-  playCard({ cardIndexes } : { cardIndexes: number[] }) {
+  getCards({ cardIndexes } : { cardIndexes: number[] }) {
     return this.getActiveHand().playCard(cardIndexes);
   }
 
@@ -73,9 +81,10 @@ class Player {
   }
 
   toString() {
-    return `${this.name}: 
-${this.hands.map(h => h?.toString()).join(' | ')}`;
+    return `${this.name}: ${this.hands.map(h => h?.toString()).join(' | ')}`;
   }
+
+  abstract play (table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules, drawPileCards: number): Promise<PlayerAction>;
 }
 
 export default Player;

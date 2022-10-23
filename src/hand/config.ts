@@ -5,6 +5,7 @@ export enum HandType {
 }
 
 export type HandConfig = {
+  type: HandType
   limit?: number,
   priority: number,
   min?: number,
@@ -15,9 +16,9 @@ export type HandConfigMap = {
 }
 
 const Config: HandConfigMap = {
-  "SECRET": { "limit": 3, "priority": 2 },
-  "DEFENSE": { "limit": 3, "priority": 1 },
-  "PLAYER": { "min": 3, "priority": 0 }
+  [HandType.SECRET]: { type: HandType.SECRET, "limit": 3, "priority": 2 },
+  [HandType.DEFENSE]: { type: HandType.DEFENSE, "limit": 3, "priority": 1 },
+  [HandType.PLAYER]: { type: HandType.PLAYER, "min": 3, "priority": 0 }
 };
 
 export default Config;

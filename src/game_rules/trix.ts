@@ -12,8 +12,7 @@ export const afterXCanPlayAnyOf: Record<number, number[]> = {
 afterXCanPlayAnyOf["13"] = [...afterXCanPlayAnyOf["1"], 13];
 afterXCanPlayAnyOf["12"] = [...afterXCanPlayAnyOf["13"], 12];
 afterXCanPlayAnyOf["11"] = [...afterXCanPlayAnyOf["12"], 11];
-afterXCanPlayAnyOf["10"] = [...afterXCanPlayAnyOf["11"], 10];
-afterXCanPlayAnyOf["9"] = [...afterXCanPlayAnyOf["10"], 9];
+afterXCanPlayAnyOf["9"] = [...afterXCanPlayAnyOf["11"], 9];
 afterXCanPlayAnyOf["8"] = [...afterXCanPlayAnyOf["9"], 8];
 afterXCanPlayAnyOf["6"] = [...afterXCanPlayAnyOf["8"], 7, 6];
 afterXCanPlayAnyOf["5"] = [...afterXCanPlayAnyOf["6"], 5];
@@ -38,7 +37,12 @@ canPlayXAfterAnyOfY["1"] = [...canPlayXAfterAnyOfY["13"], 1];
 canPlayXAfterAnyOfY["10"] = [...canPlayXAfterAnyOfY["1"], 7];
 canPlayXAfterAnyOfY["2"] = [...canPlayXAfterAnyOfY["1"], 7];
 
-export const cardRules = {
+export interface CardRules {
+    xCanBePlayedAfterY: ({ x, y }: { x: PokerCard, y: PokerCard }) => boolean;
+    getValidCardsAfter: (x: PokerCard) => number[];
+}
+
+export const cardRules: CardRules = {
     xCanBePlayedAfterY: ({ x, y }: { x: PokerCard, y: PokerCard }) => {
         return canPlayXAfterAnyOfY[x.number].includes(y.number);
     },
@@ -56,6 +60,13 @@ export type ActionResolution = {
         playCards?: boolean,
     }
 };
+
+export interface TableRules {
+    canPlayCards: (table: Table, cards: PokerCard[]) => boolean;
+    canDiscard: (table: Table, cards: PokerCard[]) => boolean;
+    resolveAction: (table: Table, cards: PokerCard[]) => ActionResolution;
+    canPlaySomething: (table: Table, player: Player) => boolean;
+}
 
 export const tableRules = {
     canPlayCards: (table: Table, cards: PokerCard[]) => {
