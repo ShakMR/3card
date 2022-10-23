@@ -10,6 +10,10 @@ abstract class Card {
   abstract get symbol(): string | number;
   abstract get suitSymbol(): string;
 
+  toString() {
+    return `${this.number}-${this.suit}`;
+  }
+
   valueOf() {
     return this.number;
   }

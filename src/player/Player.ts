@@ -15,10 +15,16 @@ export type PlayerAction = {
   }
 }
 
+export enum TypeOfPlayer {
+  Human,
+  Bot,
+}
+
 abstract class Player {
   name: string
   handPriority: number;
   hands: [PlayerHand | null, DefenseHand | null, SecretHand | null];
+  abstract typeOfPlayer: TypeOfPlayer;
 
   constructor({ name }: { name: string }) {
     this.name = name;
@@ -48,7 +54,7 @@ abstract class Player {
     return !hand;
   }
 
-  getActiveHand() {
+  getActiveHand(): Hand {
     const hand = this.hands.find((h) => h && h.cards.length > 0);
     if (!hand) {
       console.error(this.hands);

@@ -12,12 +12,15 @@ import Player from "./player/Player";
 import Table from "./table/Table";
 import Display from "./display/Display";
 import { cardRules, tableRules } from "./game_rules/trix";
+import { ILogger } from "./logger/Logger";
 
 type GameEngineParams = {
   players: Player[],
   deck: Deck,
   table: Table,
   display: Display,
+  moreThanOneHuman: boolean,
+  logger: ILogger,
 }
 
 class GameEngine {
@@ -27,12 +30,16 @@ class GameEngine {
   table: Table;
   display: Display;
   message: string[] = [];
+  moreThanOneHuman: boolean;
+  logger: ILogger;
 
-  constructor({ players, deck, table, display }: GameEngineParams) {
+  constructor({ players, deck, table, display, moreThanOneHuman, logger }: GameEngineParams) {
     this.players = players;
     this.deck = deck;
     this.table = table;
     this.display = display;
+    this.moreThanOneHuman = moreThanOneHuman
+    this.logger = logger;
   }
 
   _dealHands(handConfig: HandConfig) {
@@ -77,6 +84,7 @@ class GameEngine {
     const visiblePlayers = createVisiblePlayers(this.players, this.turn)
     while (!resolution) {
       const { action, data } = await currentPlayer.play(visibleTable, visiblePlayers, cardRules, this.deck.cards.length)
+      this.logger.info(`${currentPlayer.name} does ${action}`, data);
       switch (action) {
         case USER_ACTIONS.PLAY_CARDS:
           resolution = await this.play(currentPlayer, data!.cardIndexes!);
@@ -96,6 +104,7 @@ class GameEngine {
           this.discardCards(currentPlayer, data!.cardIndexes!);
           break;
         default:
+          this.logger.error(`Unkown user action ${action}`);
           this.addMessage(`Unknown user action ${action}`);
       }
     }
@@ -105,11 +114,13 @@ class GameEngine {
   async play(player: Player, cardIndexes: number[]): Promise<Resolutions> {
     const cards = player.getCards({ cardIndexes });
     if (!cards) {
+      this.logger.error(`Unreachable code, invalid card indexes: ${cardIndexes}`);
       throw new Error(`Unreachable code, invalid card indexes: ${cardIndexes}`);
     }
 
     const { resolution, additionalData } = tableRules.resolveAction(this.table, cards);
     if (resolution === Resolutions.NOPE) {
+      this.logger.warn(`Cannot play that card, ${cards}`);
       this.addMessage("You cannot play that card");
 
       for (let card of cards) {
@@ -134,7 +145,7 @@ class GameEngine {
         this.table.discardCardsFromStack(cardsToDiscard);
       }
 
-      if (!player.hasFinished()) {
+      if (player.hasFinished()) {
         return Resolutions.END;
       }
 
@@ -149,7 +160,8 @@ class GameEngine {
   eatAll(player: Player): Resolutions {
     this.addMessage(`${player.name} cannot play should take all card.`);
     const stack = this.table.getStack();
-    stack.forEach(c => player.returnCard(c));
+    const hand = player.getPlayerHand();
+    stack.forEach(c => hand.addCard(c));
     return Resolutions.NEXT;
   }
 
@@ -242,7 +254,9 @@ class GameEngine {
   }
 
   async waitForUser() {
-    await terminal.askUser("Press ENTER to continue");
+    if (this.moreThanOneHuman) {
+      await terminal.askUser("Press ENTER to continue");
+    }
   }
 
   async cannotPlay(currentPlayer: Player) {

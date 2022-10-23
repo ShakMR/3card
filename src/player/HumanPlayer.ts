@@ -1,4 +1,4 @@
-import Player, { PlayerAction } from "./Player";
+import Player, { PlayerAction, TypeOfPlayer } from "./Player";
 import UserInput, { USER_ACTIONS } from "../user_input/UserInput";
 import { VisibleTable } from "../table/visibleTable";
 import { VisiblePlayers } from "./visiblePlayers";
@@ -7,6 +7,7 @@ import terminal from "../utils";
 
 class HumanPlayer extends Player {
     input: UserInput;
+    typeOfPlayer: TypeOfPlayer = TypeOfPlayer.Human;
 
     constructor({name, input}: { name: string, input: UserInput }) {
         super({name});

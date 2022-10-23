@@ -1,6 +1,6 @@
 import Display, { Status } from "./Display";
 import Card from "../card/Card";
-import Player from "../player/Player";
+import Player, { TypeOfPlayer } from "../player/Player";
 import Hand from "../hand/Hand";
 
 enum Styles {
@@ -118,7 +118,7 @@ const tableTopCardSuit = (card: Card) => {
 };
 
 
-function onePlayerTable<C extends Card>({table, players, turn, deck}: Status): void {
+function onePlayerTable<C extends Card>({table, players, turn, deck}: Status, showBotsHand: boolean): void {
     const topCard = table.topCard();
     const hands = players[turn].getAllHands();
 
@@ -136,7 +136,7 @@ ${handsDisplay.join("")}
 `);
 }
 
-function twoPlayerTable<C extends Card>({table, players, turn, deck, hidden = false}: Status): void {
+function twoPlayerTable<C extends Card>({table, players, turn, deck, hidden = false}: Status, showBotsHand: boolean): void {
     const topCard = table.topCard();
     const playingNow = players[turn];
     const contrary = players[(turn + 1) % players.length];
@@ -145,6 +145,13 @@ function twoPlayerTable<C extends Card>({table, players, turn, deck, hidden = fa
 
     const deckString = deck.cards.length >= 10 ? `${deck.cards.length}` : `0${deck.cards.length}`;
 
+    let shouldShowHand = !hidden;
+
+    if (playingNow.typeOfPlayer === TypeOfPlayer.Bot) {
+        shouldShowHand = shouldShowHand && showBotsHand;
+    }
+
+    console.log(playingNow.typeOfPlayer, showBotsHand, hidden);
     console.log(`
 ${handCardsHorizontal({hands: contraryHands, reverse: true}).join("")}
 ${contrary.name}
@@ -157,7 +164,7 @@ ${contrary.name}
   ${cardLine({})}    ${cardLine({})}
 
 ${playingNow.name}
-${handCardsHorizontal({hands, reverse: false, showPlayerHand: !hidden}).join("")}
+${handCardsHorizontal({hands, reverse: false, showPlayerHand: shouldShowHand}).join("")}
 `);
 }
 
@@ -172,13 +179,15 @@ class Terminal extends Display {
         super();
     }
 
-    displayCurrentPlayerStatus<C extends Card>(status: Status) {
+    displayCurrentPlayerStatus(status: Status) {
         const nPlayers = status.players.length;
+
+        const nHumanPlayers = status.players.reduce((acc, player) => acc + (player.typeOfPlayer === TypeOfPlayer.Human ? 1 : 0), 0)
 
         const funct = tableDisplayFuncs[nPlayers];
 
         if (funct) {
-            funct(status);
+            funct(status, nHumanPlayers === 0);
         }
     }
 
