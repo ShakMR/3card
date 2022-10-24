@@ -1,4 +1,4 @@
-import UserInput, { USER_ACTIONS } from "./user_input/UserInput";
+import { USER_ACTIONS } from "./user_input/UserInput";
 
 import { Resolutions } from "./resolutions";
 import createVisiblePlayers from "./player/visiblePlayers";
@@ -32,6 +32,7 @@ class GameEngine {
   message: string[] = [];
   moreThanOneHuman: boolean;
   logger: ILogger;
+  round: number = 0;
 
   constructor({ players, deck, table, display, moreThanOneHuman, logger }: GameEngineParams) {
     this.players = players;
@@ -42,7 +43,7 @@ class GameEngine {
     this.logger = logger;
   }
 
-  _dealHands(handConfig: HandConfig) {
+  private dealHands(handConfig: HandConfig) {
     for (let i = 0; i < (handConfig.limit || 3); i++) {
       while (this.turn < this.players.length) {
         const card = this.deck.pickCard();
@@ -60,11 +61,16 @@ class GameEngine {
 
   async run() {
     // dealing secret
-    this._dealHands(HANDS_CONFIG.SECRET);
-    this._dealHands(HANDS_CONFIG.DEFENSE);
-    this._dealHands(HANDS_CONFIG.PLAYER);
+    this.dealHands(HANDS_CONFIG.SECRET);
+    this.dealHands(HANDS_CONFIG.DEFENSE);
+    this.dealHands(HANDS_CONFIG.PLAYER);
+
+    this.showStatus();
+
+    await this.firstTurnExchange();
 
     while (true) {
+      this.round++;
       this.showStatus();
       const currentPlayer = this.players[this.turn];
       if (!tableRules.canPlaySomething(this.table, currentPlayer)) {
@@ -78,12 +84,12 @@ class GameEngine {
     }
   }
 
-  async playTurn(currentPlayer: Player) {
+  private async playTurn(currentPlayer: Player) {
     let resolution;
     const visibleTable = createVisibleTable(this.table);
     const visiblePlayers = createVisiblePlayers(this.players, this.turn)
     while (!resolution) {
-      const { action, data } = await currentPlayer.play(visibleTable, visiblePlayers, cardRules, this.deck.cards.length)
+      const { action, data } = await currentPlayer.play(this.round, visibleTable, visiblePlayers, cardRules, this.deck.cards.length)
       this.logger.info(`${currentPlayer.name} does ${action}`, data);
       switch (action) {
         case USER_ACTIONS.PLAY_CARDS:
@@ -111,7 +117,7 @@ class GameEngine {
     return resolution;
   }
 
-  async play(player: Player, cardIndexes: number[]): Promise<Resolutions> {
+  private async play(player: Player, cardIndexes: number[]): Promise<Resolutions> {
     const cards = player.getCards({ cardIndexes });
     if (!cards) {
       this.logger.error(`Unreachable code, invalid card indexes: ${cardIndexes}`);
@@ -157,7 +163,7 @@ class GameEngine {
     return resolution;
   }
 
-  eatAll(player: Player): Resolutions {
+  private eatAll(player: Player): Resolutions {
     this.addMessage(`${player.name} cannot play should take all card.`);
     const stack = this.table.getStack();
     const hand = player.getPlayerHand();
@@ -165,7 +171,7 @@ class GameEngine {
     return Resolutions.NEXT;
   }
 
-  async whatToPlay() {
+  private async whatToPlay() {
     const topCard = this.table.topCard();
     if (!topCard) {
       this.addMessage("Anything");
@@ -174,7 +180,7 @@ class GameEngine {
     }
   }
 
-  nextPlayerIndex(howMany: number): number {
+  private nextPlayerIndex(howMany: number): number {
     let turn = this.turn + howMany;
     if (turn >= this.players.length) {
       turn = turn % this.players.length;
@@ -182,7 +188,7 @@ class GameEngine {
     return turn;
   }
 
-  nextPlayer(resolution: Resolutions) {
+  private nextPlayer(resolution: Resolutions) {
     const next = (howMany = 1, draw: boolean) => {
       this.addMessage(`Next Player - ${this.players[this.nextPlayerIndex(nextJump)].name}`);
       if (draw) {
@@ -219,7 +225,7 @@ class GameEngine {
     next(nextJump, draw);
   }
 
-  drawCardPlayer() {
+  private drawCardPlayer() {
     const currentPlayer = this.players[this.turn];
     const hand = currentPlayer.getPlayerHand();
     if (hand.hasEnoughCards() || this.deck.cards.length === 0) {
@@ -232,7 +238,7 @@ class GameEngine {
     this.drawCardPlayer();
   }
 
-  showStatus({ hidden } = { hidden: false }) {
+  private showStatus({ hidden } = { hidden: false }) {
     this.clear();
     this.display.displayCurrentPlayerStatus({
       turn: this.turn,
@@ -245,21 +251,21 @@ class GameEngine {
     this.message = [];
   }
 
-  clear() {
+  private clear() {
     this.display.clear();
   }
 
-  addMessage(msg: string) {
+  private addMessage(msg: string) {
     this.message.push(msg);
   }
 
-  async waitForUser() {
+  private async waitForUser() {
     if (this.moreThanOneHuman) {
       await terminal.askUser("Press ENTER to continue");
     }
   }
 
-  async cannotPlay(currentPlayer: Player) {
+  private async cannotPlay(currentPlayer: Player) {
     this.addMessage(`Player ${currentPlayer.name} cannot play any card`);
     this.showStatus();
     await this.waitForUser();
@@ -267,15 +273,33 @@ class GameEngine {
     this.nextPlayer(Resolutions.NEXT);
   }
 
-  discardCards(currentPlayer: Player, cardIndexes: number[]) {
+  private discardCards(currentPlayer: Player, cardIndexes: number[]) {
     const cards = currentPlayer.getCards({ cardIndexes });
     this.addMessage(`Player ${currentPlayer.name} discarded ${cards.length} cards with number ${cards[0].number}`);
     this.table.discardCards(cards);
     return Resolutions.SAME;
   }
 
-  endGame() {
+  private endGame() {
     this.display.endGame(this.players[this.turn]);
+  }
+
+  private async firstTurnExchange() {
+    for (let [index, player] of this.players.entries()) {
+      const { action, data } = await player.play(0, createVisibleTable(this.table), createVisiblePlayers(this.players, index), cardRules, this.deck.cards.length);
+
+      if (action === USER_ACTIONS.EXCHANGE) {
+        const [playerHand, defenseHand] = player.getAllHands();
+        data!.exchange!.forEach((defenseIndex, playerIndex) => {
+          if (defenseIndex) {
+            const cardD = defenseHand!.getCard(defenseIndex)!;
+            const cardP = playerHand!.getCard(playerIndex)!;
+            defenseHand!.replaceCard(cardP, defenseIndex);
+            playerHand!.replaceCard(cardD, playerIndex);
+          }
+        });
+      }
+    }
   }
 }
 

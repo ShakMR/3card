@@ -3,7 +3,6 @@ import { VisibleTable } from "../table/visibleTable";
 import { VisiblePlayers } from "./visiblePlayers";
 import { CardRules } from "../game_rules/trix";
 import { USER_ACTIONS } from "../user_input/UserInput";
-import { Logger } from "winston";
 import { ILogger } from "../logger/Logger";
 
 const {uniqueNamesGenerator, starWars, colors, adjectives} = require("unique-names-generator");
@@ -29,7 +28,13 @@ class RandomComputerPlayer extends Player {
         super({name: `Random ${name}`});
     }
 
-    async play(table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules, drawPileCards: number): Promise<PlayerAction> {
+    async play(round: number, table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules, drawPileCards: number): Promise<PlayerAction> {
+        if (round === 0) {
+            return {
+                action: USER_ACTIONS.NP
+            }
+        }
+
         await waitMilliseconds(500);
         const indexesToPlay = new Array<number>();
         const topCard = table.topCard();

@@ -50,7 +50,27 @@ class HumanPlayer extends Player {
         };
     }
 
-    async play(table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules, drawPileCards: number): Promise<PlayerAction> {
+    private async selectExchange() {
+        const card1Index = await this.input.getExchangeForPosition(this.name, 0);
+        const card2Index = await this.input.getExchangeForPosition(this.name, 1);
+        const card3Index = await this.input.getExchangeForPosition(this.name, 2);
+
+        return [
+            card1Index,
+            card2Index,
+            card3Index,
+        ]
+    }
+
+    async play(round: number, table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules, drawPileCards: number): Promise<PlayerAction> {
+        if (round === 0) {
+            return {
+                action: USER_ACTIONS.EXCHANGE,
+                data: {
+                    exchange: await this.selectExchange(),
+                },
+            };
+        }
         const shouldSelectByIndex = !this.getActiveHand().visible;
         while (true) {
             // loop until one action has been taken

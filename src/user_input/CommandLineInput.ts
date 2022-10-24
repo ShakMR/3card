@@ -38,6 +38,10 @@ class CommandLineInput extends UserInput {
         return upperAnswer;
     }
   }
+
+  async getExchangeForPosition(name: string, position: number): Promise<number> {
+    return terminal.askUserForNumber(`Do you want to exchange card in position ${position} for any in defense?`, 0, 2, true);
+  }
 }
 
 export default CommandLineInput;

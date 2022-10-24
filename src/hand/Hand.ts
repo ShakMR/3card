@@ -58,6 +58,10 @@ class Hand {
     }
   }
 
+  replaceCard(card: Card, index: number) {
+    this._cards[index] = card;
+  }
+
   playCard(indexes: number[]) {
     return indexes.reverse().map((index) => this._cards.splice(index, 1)[0])
   }

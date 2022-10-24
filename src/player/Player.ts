@@ -12,6 +12,7 @@ export type PlayerAction = {
   action: USER_ACTIONS | "Error",
   data?: {
     cardIndexes?: number[],
+    exchange?: number[],
   }
 }
 
@@ -92,7 +93,13 @@ abstract class Player {
     return `${this.name}: ${this.hands.map(h => h?.toString()).join(' | ')}`;
   }
 
-  abstract play (table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules, drawPileCards: number): Promise<PlayerAction>;
+  abstract play (
+      round: number,
+      table: VisibleTable,
+      otherPlayers: VisiblePlayers,
+      cardRules: CardRules,
+      drawPileCards: number
+  ): Promise<PlayerAction>;
 }
 
 export default Player;
