@@ -11,7 +11,7 @@ enum Styles {
     blink = "\x1b[5m",
     reverse = "\x1b[7m",
     hidden = "\x1b[8m",
-};
+}
 
 enum FontColor {
     black = "\x1b[30m",
@@ -118,7 +118,7 @@ const tableTopCardSuit = (card: Card) => {
 };
 
 
-function onePlayerTable<C extends Card>({table, players, turn, deck}: Status, showBotsHand: boolean): void {
+function onePlayerTable({table, players, turn, deck}: Status): void {
     const topCard = table.topCard();
     const hands = players[turn].getAllHands();
 
@@ -136,7 +136,7 @@ ${handsDisplay.join("")}
 `);
 }
 
-function twoPlayerTable<C extends Card>({table, players, turn, deck, hidden = false}: Status, showBotsHand: boolean): void {
+function twoPlayerTable({table, players, turn, deck, hidden = false}: Status, showBotsHand: boolean): void {
     const topCard = table.topCard();
     const playingNow = players[turn];
     const contrary = players[(turn + 1) % players.length];

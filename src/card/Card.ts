@@ -19,7 +19,7 @@ abstract class Card {
   }
 }
 
-export function cardComparisonFunction<T>(cardA: Card | null, cardB: Card | null) {
+export function cardComparisonFunction(cardA: Card | null, cardB: Card | null) {
   return cardA && cardB ? cardA.number - cardB.number : 0;
 }
 

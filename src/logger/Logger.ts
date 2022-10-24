@@ -1,5 +1,5 @@
-import path from 'path';
-import winston, {format} from 'winston';
+import path from "path";
+import winston, { format } from "winston";
 
 
 export const createLogger = (name: string) => {
@@ -13,6 +13,6 @@ export const createLogger = (name: string) => {
     });
 };
 
-export interface ILogger extends winston.Logger {}
+export type ILogger = winston.Logger
 
 export default createLogger("default");

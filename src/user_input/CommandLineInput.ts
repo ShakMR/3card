@@ -1,6 +1,5 @@
-import terminal from "../utils"
-import UserInput, { ActionData, USER_ACTIONS } from "./UserInput";
-import Player from "../player/Player";
+import terminal from "../utils";
+import UserInput, { USER_ACTIONS } from "./UserInput";
 
 const ACTION_KEYS = {
   GET: 'G',
@@ -39,7 +38,7 @@ class CommandLineInput extends UserInput {
     }
   }
 
-  async getExchangeForPosition(name: string, position: number): Promise<number> {
+  async getExchangeForPosition(position: number): Promise<number> {
     return terminal.askUserForNumber(`Do you want to exchange card in position ${position} for any in defense?`, 0, 2, true);
   }
 }

@@ -1,4 +1,4 @@
-import Hand from './Hand'
+import Hand from "./Hand";
 
 class DefenseHand extends Hand {
   constructor() {

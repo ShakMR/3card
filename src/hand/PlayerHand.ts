@@ -1,5 +1,5 @@
-import Hand from './Hand'
-import Card, { cardComparisonFunction } from '../card/Card'
+import Hand from "./Hand";
+import Card, { cardComparisonFunction } from "../card/Card";
 
 class PlayerHand extends Hand {
   shouldHaveCards: number;

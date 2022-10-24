@@ -1,4 +1,4 @@
-import readline from 'readline'
+import readline from "readline";
 
 const terminal = readline.createInterface({
   input: process.stdin,
@@ -11,7 +11,7 @@ const askUser = async (question: string) => new Promise<string>((resolve) => {
   });
 })
 
-const askUserForNumber = async (question: string, rangeStart?: number, rangeEnds?: number, optional: boolean = false) => {
+const askUserForNumber = async (question: string, rangeStart?: number, rangeEnds?: number, optional = false) => {
   const q = rangeStart || rangeStart === 0 ? `${question} [${rangeStart} - ${rangeEnds}] ${optional ? "(optional)" : ""}` : question;
   let answer = parseInt(await askUser(q), 10);
   while (!optional && (isNaN(answer) || (rangeStart && answer < rangeStart) || (rangeEnds && answer > rangeEnds))) {

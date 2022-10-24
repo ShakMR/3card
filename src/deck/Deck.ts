@@ -1,6 +1,6 @@
-import Card from '../card/Card'
+import Card from "../card/Card";
 
-function shuffle<T extends unknown>(array: T[]) {
+function shuffle<T>(array: T[]) {
   let currentIndex = array.length,  randomIndex;
 
   // While there remain elements to shuffle.
@@ -28,6 +28,8 @@ class Deck {
     this.deckDefinition = deckDefinition;
   }
 
+  // TODO fix this type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   init(createCardInstante: (...args: any) => Card) {
     const tempDeck: Card[] = []
     Object.entries(this.deckDefinition).forEach(([suit, numbers]) => {

@@ -25,14 +25,14 @@ type GameEngineParams = {
 
 class GameEngine {
   players: Player[];
-  turn: number = 0;
+  turn = 0;
   deck: Deck;
   table: Table;
   display: Display;
   message: string[] = [];
   moreThanOneHuman: boolean;
   logger: ILogger;
-  round: number = 0;
+  round = 0;
 
   constructor({ players, deck, table, display, moreThanOneHuman, logger }: GameEngineParams) {
     this.players = players;
@@ -69,6 +69,7 @@ class GameEngine {
 
     await this.firstTurnExchange();
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       this.round++;
       this.showStatus();
@@ -129,7 +130,7 @@ class GameEngine {
       this.logger.warn(`Cannot play that card, ${cards}`);
       this.addMessage("You cannot play that card");
 
-      for (let card of cards) {
+      for (const card of cards) {
         player.returnCard(card);
       }
     } else {
@@ -285,7 +286,7 @@ class GameEngine {
   }
 
   private async firstTurnExchange() {
-    for (let [index, player] of this.players.entries()) {
+    for (const [index, player] of this.players.entries()) {
       const { action, data } = await player.play(0, createVisibleTable(this.table), createVisiblePlayers(this.players, index), cardRules, this.deck.cards.length);
 
       if (action === USER_ACTIONS.EXCHANGE) {

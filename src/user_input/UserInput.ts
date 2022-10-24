@@ -1,5 +1,3 @@
-import Player from "../player/Player";
-
 export enum USER_ACTIONS {
   PLAY_CARDS = 'play',
   DISCARD_CARDS = 'discard',
@@ -10,12 +8,10 @@ export enum USER_ACTIONS {
   NP = 'np',
 }
 
-export type ActionData = { type: USER_ACTIONS, data?: any } | { type: 'Error' };
-
 abstract class UserInput {
-  abstract getOrder(...args: any): Promise<USER_ACTIONS | string>;
+  abstract getOrder(name: string, shouldSelectByIndex: boolean): Promise<USER_ACTIONS | string>;
 
-  abstract getExchangeForPosition(name: string, position: number): Promise<number>;
+  abstract getExchangeForPosition(position: number): Promise<number>;
 }
 
 

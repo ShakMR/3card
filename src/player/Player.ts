@@ -4,7 +4,7 @@ import PlayerHand from "../hand/PlayerHand";
 import Hand from "../hand/Hand";
 import Card from "../card/Card";
 import { USER_ACTIONS } from "../user_input/UserInput";
-import { CardRules, TableRules } from "../game_rules/trix";
+import { CardRules } from "../game_rules/trix";
 import { VisiblePlayers } from "./visiblePlayers";
 import { VisibleTable } from "../table/visibleTable";
 

@@ -1,5 +1,4 @@
 import Player, { PlayerAction, TypeOfPlayer } from "../Player";
-import { USER_ACTIONS } from "../../user_input/UserInput";
 import Hand from "../../hand/Hand";
 import PlayerHand from "../../hand/PlayerHand";
 import Card from "../../card/Card";
@@ -8,7 +7,7 @@ import secretHand from "../../hand/SecretHand";
 import SecretHand from "../../hand/SecretHand";
 
 class TestPlayer extends Player {
-    constructor(public name: string, private playResult: any) {
+    constructor(public name: string, private playResult: unknown) {
         super({name});
     }
 

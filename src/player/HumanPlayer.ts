@@ -1,8 +1,5 @@
 import Player, { PlayerAction, TypeOfPlayer } from "./Player";
 import UserInput, { USER_ACTIONS } from "../user_input/UserInput";
-import { VisibleTable } from "../table/visibleTable";
-import { VisiblePlayers } from "./visiblePlayers";
-import { CardRules } from "../game_rules/trix";
 import terminal from "../utils";
 
 class HumanPlayer extends Player {
@@ -51,9 +48,9 @@ class HumanPlayer extends Player {
     }
 
     private async selectExchange() {
-        const card1Index = await this.input.getExchangeForPosition(this.name, 0);
-        const card2Index = await this.input.getExchangeForPosition(this.name, 1);
-        const card3Index = await this.input.getExchangeForPosition(this.name, 2);
+        const card1Index = await this.input.getExchangeForPosition(0);
+        const card2Index = await this.input.getExchangeForPosition(1);
+        const card3Index = await this.input.getExchangeForPosition(2);
 
         return [
             card1Index,
@@ -62,7 +59,7 @@ class HumanPlayer extends Player {
         ]
     }
 
-    async play(round: number, table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules, drawPileCards: number): Promise<PlayerAction> {
+    async play(round: number): Promise<PlayerAction> {
         if (round === 0) {
             return {
                 action: USER_ACTIONS.EXCHANGE,
@@ -72,6 +69,7 @@ class HumanPlayer extends Player {
             };
         }
         const shouldSelectByIndex = !this.getActiveHand().visible;
+        // eslint-disable-next-line no-constant-condition
         while (true) {
             // loop until one action has been taken
             let order;
@@ -91,6 +89,7 @@ class HumanPlayer extends Player {
                         action: order,
                     };
                 default:
+                    // eslint-disable-next-line no-case-declarations
                     const { action, data } = await this.selectCards(order, shouldSelectByIndex);
                     if (action !== "Error") {
                         return {

@@ -1,20 +1,20 @@
-import sourceMapSupport from 'source-map-support';
-sourceMapSupport.install();
-
-import GameEngine from "./gameEngine"
-import PlayerHand from "./hand/PlayerHand"
-import SecretHand from "./hand/SecretHand"
-import DefenseHand from "./hand/DefenseHand"
-import Table from "./table/Table"
-import utils from "./utils"
-import HANDS_CONFIG from "./hand/config"
-import Terminal from "./display/Terminal"
-import CommandLineInput from "./user_input/CommandLineInput"
+import sourceMapSupport from "source-map-support";
+import GameEngine from "./gameEngine";
+import PlayerHand from "./hand/PlayerHand";
+import SecretHand from "./hand/SecretHand";
+import DefenseHand from "./hand/DefenseHand";
+import Table from "./table/Table";
+import utils from "./utils";
+import HANDS_CONFIG from "./hand/config";
+import Terminal from "./display/Terminal";
+import CommandLineInput from "./user_input/CommandLineInput";
 import PokerDeck from "./deck/PokerDeck";
 import HumanPlayer from "./player/HumanPlayer";
 import UserInput from "./user_input/UserInput";
 import RandomComputerPlayer from "./player/RandomComputerPlayer";
 import { createLogger } from "./logger/Logger";
+
+sourceMapSupport.install();
 
 const logger = createLogger("general");
 

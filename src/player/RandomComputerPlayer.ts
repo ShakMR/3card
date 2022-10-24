@@ -1,3 +1,5 @@
+import { adjectives, starWars, uniqueNamesGenerator } from "unique-names-generator";
+
 import Player, { PlayerAction, TypeOfPlayer } from "./Player";
 import { VisibleTable } from "../table/visibleTable";
 import { VisiblePlayers } from "./visiblePlayers";
@@ -5,7 +7,6 @@ import { CardRules } from "../game_rules/trix";
 import { USER_ACTIONS } from "../user_input/UserInput";
 import { ILogger } from "../logger/Logger";
 
-const {uniqueNamesGenerator, starWars, colors, adjectives} = require("unique-names-generator");
 
 const getRandomPick = (array: number[]): number => {
     const pick = Math.floor(Math.random() * array.length);
@@ -28,7 +29,7 @@ class RandomComputerPlayer extends Player {
         super({name: `Random ${name}`});
     }
 
-    async play(round: number, table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules, drawPileCards: number): Promise<PlayerAction> {
+    async play(round: number, table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules): Promise<PlayerAction> {
         if (round === 0) {
             return {
                 action: USER_ACTIONS.NP
@@ -40,7 +41,7 @@ class RandomComputerPlayer extends Player {
         const topCard = table.topCard();
         const activeHand = this.getActiveHand();
         if (activeHand.cards && activeHand.cards[0] !== null) {
-            for (let [index, card] of activeHand.cards.entries()) {
+            for (const [index, card] of activeHand.cards.entries()) {
                 const canBePlayer = !topCard || cardRules.xCanBePlayedAfterY({x: card!, y: topCard});
                 this.logger.info(`${this.name} tested if ${card} can be played on top of ${topCard} -> ${canBePlayer}`);
                 if (canBePlayer) {

@@ -1,7 +1,6 @@
 import Card from "../card/Card";
 import Player from "./Player";
-import HANDS_CONFIG, { HandType } from "../hand/config";
-import VisibleTable from "../table/visibleTable";
+import HANDS_CONFIG from "../hand/config";
 
 export enum PlayerPosition {
     left = "left",
