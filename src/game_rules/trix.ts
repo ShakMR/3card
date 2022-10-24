@@ -137,6 +137,6 @@ export const tableRules = {
         const hand = player.getActiveHand();
         const topCard = table.topCard();
 
-        return !topCard || hand.cards.some((c) => cardRules.xCanBePlayedAfterY({x: c, y: topCard}));
+        return !topCard || hand.cards.some((c) => c && cardRules.xCanBePlayedAfterY({x: c, y: topCard}));
     },
 }

@@ -25,8 +25,8 @@ class PlayerHand extends Hand {
     this.cards.sort(cardComparisonFunction);
   }
 
-  addCard(card: Card) {
-    return this.cards.push(card);
+  addCard(card: Card): number {
+    return super.addCard(card);
   }
 }
 

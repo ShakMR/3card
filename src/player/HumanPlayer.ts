@@ -21,7 +21,7 @@ class HumanPlayer extends Player {
             .filter(({
                 card,
                 index
-            }) => choseByIndex ? index === parseInt(cardNumberStr, 10) : `${card.symbol}` === cardNumberStr);
+            }) => choseByIndex ? index === parseInt(cardNumberStr, 10) : `${card!.symbol}` === cardNumberStr);
 
         if (cards.length === 0) {
             return {

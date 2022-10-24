@@ -23,7 +23,7 @@ export default (playerList: Player[], currentTurn: number) => {
     }
     const visiblePlayer: VisiblePlayers = {
         seeCards: (position: PlayerPosition): Card[] | undefined => {
-            return players[position]?.getHand(HANDS_CONFIG.DEFENSE.priority)?.cards;
+            return players[position]?.getHand(HANDS_CONFIG.DEFENSE.priority)?.cards as Card[];
         },
         seeNumberOfCards: (position: PlayerPosition): number | undefined => {
             return players[position]?.getActiveHand().cards.length;

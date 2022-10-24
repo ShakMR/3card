@@ -50,21 +50,21 @@ const cardLine = ({symbol, side = "left", color = FontColor.black}: CardLinePara
 };
 
 type CardLine = {
-    card: Card,
+    card: Card | null,
     visible: boolean,
 }
 
 const cardSymbolLine = ({card, visible = true}: CardLine) => {
-    const symbol = card.number !== 10 ? `${card.symbol} ` : `${card.symbol}`;
+    const symbol = card?.number !== 10 ? `${card?.symbol} ` : `${card.symbol}`;
     return cardLine({symbol: visible ? symbol : undefined, side: "left"});
 };
 
 const cardSuitsLine = ({card, visible}: CardLine) => {
     let color = FontColor.red;
-    if (["S", "C"].includes(card.suit)) {
+    if (card && ["S", "C"].includes(card.suit)) {
         color = FontColor.black;
     }
-    return cardLine({symbol: visible ? card.suitSymbol : undefined, side: "right", color});
+    return cardLine({symbol: visible ? card?.suitSymbol : undefined, side: "right", color});
 };
 
 const range = (i: number, j: number): number[] => {

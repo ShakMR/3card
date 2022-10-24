@@ -12,7 +12,6 @@ export type ActionData = { type: USER_ACTIONS, data?: any } | { type: 'Error' };
 
 abstract class UserInput {
   abstract getOrder(...args: any): Promise<USER_ACTIONS | string>;
-  abstract whatToDoInTurn(currentPlayer: Player): Promise<ActionData>;
 }
 
 

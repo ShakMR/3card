@@ -25,7 +25,8 @@ class RandomComputerPlayer extends Player {
 
 
     constructor(private logger: ILogger) {
-        super({name: uniqueNamesGenerator({dictionaries: [adjectives, starWars], style: "upperCase", separator: " "})});
+        const name = uniqueNamesGenerator({dictionaries: [adjectives, starWars], style: "capital", separator: " "})
+        super({name: `Random ${name}`});
     }
 
     async play(table: VisibleTable, otherPlayers: VisiblePlayers, cardRules: CardRules, drawPileCards: number): Promise<PlayerAction> {
@@ -33,16 +34,20 @@ class RandomComputerPlayer extends Player {
         const indexesToPlay = new Array<number>();
         const topCard = table.topCard();
         const activeHand = this.getActiveHand();
-        for (let [index, card] of activeHand.cards.entries()) {
-            const canBePlayer = !topCard || cardRules.xCanBePlayedAfterY({x: card, y: topCard});
-            this.logger.info(`${this.name} tested if ${card} can be played on top of ${topCard} -> ${canBePlayer}`);
-            if (canBePlayer) {
-                indexesToPlay.push(index);
+        if (activeHand.cards && activeHand.cards[0] !== null) {
+            for (let [index, card] of activeHand.cards.entries()) {
+                const canBePlayer = !topCard || cardRules.xCanBePlayedAfterY({x: card!, y: topCard});
+                this.logger.info(`${this.name} tested if ${card} can be played on top of ${topCard} -> ${canBePlayer}`);
+                if (canBePlayer) {
+                    indexesToPlay.push(index);
+                }
             }
+        } else {
+            activeHand.cards.forEach((c, i) => indexesToPlay.push(i))
         }
 
         const indexToPlay = getRandomPick(indexesToPlay);
-        this.logger.info(`${this.name} plays ${activeHand.cards} ${indexToPlay} -> ${activeHand.cards[indexToPlay]} on top of ${topCard}`)
+        this.logger.info(`${this.name} plays ${activeHand.cards} ${indexToPlay} -> ${activeHand.cards?.[indexToPlay] || "SECRET"} on top of ${topCard}`)
 
         return {
             action: USER_ACTIONS.PLAY_CARDS,

@@ -1,4 +1,4 @@
-import Player, { PlayerAction } from "../Player";
+import Player, { PlayerAction, TypeOfPlayer } from "../Player";
 import { USER_ACTIONS } from "../../user_input/UserInput";
 import Hand from "../../hand/Hand";
 import PlayerHand from "../../hand/PlayerHand";
@@ -15,6 +15,8 @@ class TestPlayer extends Player {
     async play(): Promise<PlayerAction> {
         return this.playResult as PlayerAction
     }
+
+    typeOfPlayer: TypeOfPlayer = TypeOfPlayer.Bot;
 }
 
 class TestCard extends Card {

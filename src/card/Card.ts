@@ -19,8 +19,8 @@ abstract class Card {
   }
 }
 
-export function cardComparisonFunction<T>(cardA: Card, cardB: Card) {
-  return cardA.number - cardB.number;
+export function cardComparisonFunction<T>(cardA: Card | null, cardB: Card | null) {
+  return cardA && cardB ? cardA.number - cardB.number : 0;
 }
 
 export default Card;

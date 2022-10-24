@@ -10,7 +10,7 @@ type HandProps = {
 }
 
 class Hand {
-  cards: Card[];
+  private readonly _cards: Card[];
   limit?: number;
   visible: boolean;
   canPlayMultiple: boolean;
@@ -25,7 +25,7 @@ class Hand {
     returnOnFail = false,
     priority,
   }: HandProps) {
-    this.cards = cards;
+    this._cards = cards;
     this.limit = limit;
     this.visible = visible;
     this.priority = priority;
@@ -38,34 +38,36 @@ class Hand {
   }
 
   isLimitReached() {
-    return this.limit && this.limit <= this.cards.length;
+    return this.limit && this.limit <= this._cards.length;
   }
 
-  getCard(index: number) {
-    if (this.visible) {
-      return this.cards[index];
-    }
+  get cards(): Card[] | null[] {
+    return this.visible ? this._cards : this._cards.map(() => null);
+  }
+
+  getCard(index: number): Card | null {
+    return this.visible ? this._cards[index] : null;
   }
 
   addCard(card: Card) {
-    if (!this.limit || this.limit >= this.cards.length) {
-      this.cards.push(card);
-      return this.cards.length - (this.limit || 0);
+    if (!this.limit || this.limit >= this._cards.length) {
+      this._cards.push(card);
+      return this._cards.length - (this.limit || 0);
     } else {
       throw new Error("Cannot add more cards");
     }
   }
 
   playCard(indexes: number[]) {
-    return indexes.reverse().map((index) => this.cards.splice(index, 1)[0])
+    return indexes.reverse().map((index) => this._cards.splice(index, 1)[0])
   }
 
   isEmpty() {
-    return this.cards.length === 0;
+    return this._cards.length === 0;
   }
 
   toString() {
-    return this.visible ? this.cards.map(c => c.toString()) : 'X-X';
+    return this.visible ? this._cards.map(c => c.toString()) : 'X-X';
   }
 }
 
