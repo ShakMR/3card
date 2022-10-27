@@ -2,21 +2,20 @@ import terminal from "../utils";
 import UserInput, { USER_ACTIONS } from "./UserInput";
 
 const ACTION_KEYS = {
-  GET: 'G',
-  WHAT_TO_PLAY: 'W',
-  SORT: 'S',
-}
+  GET: "G",
+  WHAT_TO_PLAY: "W",
+  SORT: "S",
+};
 
 class CommandLineInput extends UserInput {
-  async getOrder(name: string, shouldSelectByIndex: boolean): Promise<USER_ACTIONS | string> {
+  async getOrder(
+    name: string,
+    shouldSelectByIndex: boolean
+  ): Promise<USER_ACTIONS | string> {
     const answer = await terminal.askUser(
-        `
+      `
   What next, ${name}?
-  ${
-            shouldSelectByIndex
-                ? "[0-2] Play facing down"
-                : "[A-10-K] play cards"
-        }
+  ${shouldSelectByIndex ? "[0-2] Play facing down" : "[A-10-K] play cards"}
   [${ACTION_KEYS.GET}] get stack of cards
   [${ACTION_KEYS.SORT}] sort hand
   [${ACTION_KEYS.WHAT_TO_PLAY}] what can I play?
@@ -39,7 +38,12 @@ class CommandLineInput extends UserInput {
   }
 
   async getExchangeForPosition(position: number): Promise<number> {
-    return terminal.askUserForNumber(`Do you want to exchange card in position ${position} for any in defense?`, 0, 2, true);
+    return terminal.askUserForNumber(
+      `Do you want to exchange card in position ${position} for any in defense?`,
+      0,
+      2,
+      true
+    );
   }
 }
 

@@ -8,13 +8,13 @@ class PlayerHand extends Hand {
     super({
       priority: 1,
       limit: 52,
-      returnOnFail: true
+      returnOnFail: true,
     });
     this.shouldHaveCards = 3;
   }
 
   hasEnoughCards() {
-    return this.shouldHaveCards <= this.cards.length
+    return this.shouldHaveCards <= this.cards.length;
   }
 
   howManyCardsShouldHave() {

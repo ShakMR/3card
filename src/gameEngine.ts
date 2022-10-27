@@ -15,13 +15,13 @@ import { cardRules, tableRules } from "./game_rules/trix";
 import { ILogger } from "./logger/Logger";
 
 type GameEngineParams = {
-  players: Player[],
-  deck: Deck,
-  table: Table,
-  display: Display,
-  moreThanOneHuman: boolean,
-  logger: ILogger,
-}
+  players: Player[];
+  deck: Deck;
+  table: Table;
+  display: Display;
+  moreThanOneHuman: boolean;
+  logger: ILogger;
+};
 
 class GameEngine {
   players: Player[];
@@ -34,12 +34,19 @@ class GameEngine {
   logger: ILogger;
   round = 0;
 
-  constructor({ players, deck, table, display, moreThanOneHuman, logger }: GameEngineParams) {
+  constructor({
+    players,
+    deck,
+    table,
+    display,
+    moreThanOneHuman,
+    logger,
+  }: GameEngineParams) {
     this.players = players;
     this.deck = deck;
     this.table = table;
     this.display = display;
-    this.moreThanOneHuman = moreThanOneHuman
+    this.moreThanOneHuman = moreThanOneHuman;
     this.logger = logger;
   }
 
@@ -49,7 +56,9 @@ class GameEngine {
         const card = this.deck.pickCard();
         const player = this.players[this.turn];
         if (!card) {
-          throw new Error(`There should be enough cards when dealing ${handConfig.type}, ${player.name}`)
+          throw new Error(
+            `There should be enough cards when dealing ${handConfig.type}, ${player.name}`
+          );
         }
         player.addCard(card, handConfig.priority);
         this.turn++;
@@ -88,9 +97,15 @@ class GameEngine {
   private async playTurn(currentPlayer: Player) {
     let resolution;
     const visibleTable = createVisibleTable(this.table);
-    const visiblePlayers = createVisiblePlayers(this.players, this.turn)
+    const visiblePlayers = createVisiblePlayers(this.players, this.turn);
     while (!resolution) {
-      const { action, data } = await currentPlayer.play(this.round, visibleTable, visiblePlayers, cardRules, this.deck.cards.length)
+      const { action, data } = await currentPlayer.play(
+        this.round,
+        visibleTable,
+        visiblePlayers,
+        cardRules,
+        this.deck.cards.length
+      );
       this.logger.info(`${currentPlayer.name} does ${action}`, data);
       switch (action) {
         case USER_ACTIONS.PLAY_CARDS:
@@ -118,14 +133,24 @@ class GameEngine {
     return resolution;
   }
 
-  private async play(player: Player, cardIndexes: number[]): Promise<Resolutions> {
+  private async play(
+    player: Player,
+    cardIndexes: number[]
+  ): Promise<Resolutions> {
+    this.logger.info(cardIndexes);
     const cards = player.getCards({ cardIndexes });
     if (!cards) {
-      this.logger.error(`Unreachable code, invalid card indexes: ${cardIndexes}`);
+      this.logger.error(
+        `Unreachable code, invalid card indexes: ${cardIndexes}`
+      );
       throw new Error(`Unreachable code, invalid card indexes: ${cardIndexes}`);
     }
 
-    const { resolution, additionalData } = tableRules.resolveAction(this.table, cards);
+    this.logger.info(cards);
+    const { resolution, additionalData } = tableRules.resolveAction(
+      this.table,
+      cards
+    );
     if (resolution === Resolutions.NOPE) {
       this.logger.warn(`Cannot play that card, ${cards}`);
       this.addMessage("You cannot play that card");
@@ -138,7 +163,8 @@ class GameEngine {
     }
 
     if (additionalData) {
-      const { discardPlayed, discardStack, cardsToDiscard, playCards } = additionalData;
+      const { discardPlayed, discardStack, cardsToDiscard, playCards } =
+        additionalData;
 
       if (discardPlayed) {
         this.table.discardCards(cards);
@@ -157,7 +183,7 @@ class GameEngine {
       }
 
       if (playCards) {
-        this.table.playCards(cards)
+        this.table.playCards(cards);
       }
     }
 
@@ -168,7 +194,7 @@ class GameEngine {
     this.addMessage(`${player.name} cannot play should take all card.`);
     const stack = this.table.getStack();
     const hand = player.getPlayerHand();
-    stack.forEach(c => hand.addCard(c));
+    stack.forEach((c) => hand.addCard(c));
     return Resolutions.NEXT;
   }
 
@@ -191,7 +217,9 @@ class GameEngine {
 
   private nextPlayer(resolution: Resolutions) {
     const next = (howMany = 1, draw: boolean) => {
-      this.addMessage(`Next Player - ${this.players[this.nextPlayerIndex(nextJump)].name}`);
+      this.addMessage(
+        `Next Player - ${this.players[this.nextPlayerIndex(nextJump)].name}`
+      );
       if (draw) {
         this.drawCardPlayer();
       }
@@ -202,7 +230,9 @@ class GameEngine {
     switch (resolution) {
       case Resolutions.JUMP:
         if (this.players.length > 2) {
-          this.addMessage(`${this.players[this.nextPlayerIndex(1)].name} has been skipped`);
+          this.addMessage(
+            `${this.players[this.nextPlayerIndex(1)].name} has been skipped`
+          );
           nextJump = 2;
         }
         break;
@@ -276,7 +306,9 @@ class GameEngine {
 
   private discardCards(currentPlayer: Player, cardIndexes: number[]) {
     const cards = currentPlayer.getCards({ cardIndexes });
-    this.addMessage(`Player ${currentPlayer.name} discarded ${cards.length} cards with number ${cards[0].number}`);
+    this.addMessage(
+      `Player ${currentPlayer.name} discarded ${cards.length} cards with number ${cards[0].number}`
+    );
     this.table.discardCards(cards);
     return Resolutions.SAME;
   }
@@ -287,7 +319,13 @@ class GameEngine {
 
   private async firstTurnExchange() {
     for (const [index, player] of this.players.entries()) {
-      const { action, data } = await player.play(0, createVisibleTable(this.table), createVisiblePlayers(this.players, index), cardRules, this.deck.cards.length);
+      const { action, data } = await player.play(
+        0,
+        createVisibleTable(this.table),
+        createVisiblePlayers(this.players, index),
+        cardRules,
+        this.deck.cards.length
+      );
 
       if (action === USER_ACTIONS.EXCHANGE) {
         const [playerHand, defenseHand] = player.getAllHands();

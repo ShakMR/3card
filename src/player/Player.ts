@@ -9,12 +9,12 @@ import { VisiblePlayers } from "./visiblePlayers";
 import { VisibleTable } from "../table/visibleTable";
 
 export type PlayerAction = {
-  action: USER_ACTIONS | "Error",
+  action: USER_ACTIONS | "Error";
   data?: {
-    cardIndexes?: number[],
-    exchange?: number[],
-  }
-}
+    cardIndexes?: number[];
+    exchange?: (number | null)[];
+  };
+};
 
 export enum TypeOfPlayer {
   Human,
@@ -22,7 +22,7 @@ export enum TypeOfPlayer {
 }
 
 abstract class Player {
-  name: string
+  name: string;
   handPriority: number;
   hands: [PlayerHand | null, DefenseHand | null, SecretHand | null];
   abstract typeOfPlayer: TypeOfPlayer;
@@ -31,7 +31,7 @@ abstract class Player {
     this.name = name;
     this.handPriority = 0;
 
-    this.hands = [null, null, null]
+    this.hands = [null, null, null];
   }
 
   getHand(priority: number) {
@@ -72,7 +72,7 @@ abstract class Player {
     this.hands[priority] = hand;
   }
 
-  getCards({ cardIndexes } : { cardIndexes: number[] }) {
+  getCards({ cardIndexes }: { cardIndexes: number[] }) {
     return this.getActiveHand().playCard(cardIndexes);
   }
 
@@ -90,15 +90,15 @@ abstract class Player {
   }
 
   toString() {
-    return `${this.name}: ${this.hands.map(h => h?.toString()).join(' | ')}`;
+    return `${this.name}: ${this.hands.map((h) => h?.toString()).join(" | ")}`;
   }
 
-  abstract play (
-      round: number,
-      table: VisibleTable,
-      otherPlayers: VisiblePlayers,
-      cardRules: CardRules,
-      drawPileCards: number
+  abstract play(
+    round: number,
+    table: VisibleTable,
+    otherPlayers: VisiblePlayers,
+    cardRules: CardRules,
+    drawPileCards: number
   ): Promise<PlayerAction>;
 }
 

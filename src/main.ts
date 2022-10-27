@@ -13,19 +13,29 @@ import HumanPlayer from "./player/HumanPlayer";
 import UserInput from "./user_input/UserInput";
 import RandomComputerPlayer from "./player/RandomComputerPlayer";
 import { createLogger } from "./logger/Logger";
+import LinearComputerPlayer from "./player/LinearComputerPlayer";
+import Bot from "./player/Bot";
 
 sourceMapSupport.install();
 
 const logger = createLogger("general");
 
-const createHumanPlayer = async (i: number, userInput: UserInput): Promise<HumanPlayer> => {
+const createHumanPlayer = async (
+  i: number,
+  userInput: UserInput
+): Promise<HumanPlayer> => {
   const name = await utils.askUser(`Player ${i + 1} name?`);
   return new HumanPlayer({ name, input: userInput });
-}
+};
 
-const createRandomComputerPlayer = async (): Promise<RandomComputerPlayer> => {
-  return new RandomComputerPlayer(logger);
-}
+const createRandomComputerPlayer = async (): Promise<Bot> => {
+  const whichBot = Math.floor(Math.random() * 2);
+  if (whichBot === 0) {
+    return new RandomComputerPlayer(logger);
+  } else {
+    return new LinearComputerPlayer(logger);
+  }
+};
 
 const main = async () => {
   const display = new Terminal();
@@ -37,7 +47,7 @@ const main = async () => {
   for (let i = 0; i < nPlayers; i++) {
     const typeOfPlayer = await utils.askUser(`Player ${i}, Human or Bot?[H/b]`);
     let p;
-    if (typeOfPlayer === 'b') {
+    if (typeOfPlayer === "b") {
       p = await createRandomComputerPlayer();
     } else {
       numberOfHumans++;
@@ -51,8 +61,15 @@ const main = async () => {
   const deck = new PokerDeck();
   deck.init();
   const table = new Table();
-  const engine = new GameEngine({ players, deck, table, display, moreThanOneHuman: numberOfHumans > 1, logger });
+  const engine = new GameEngine({
+    players,
+    deck,
+    table,
+    display,
+    moreThanOneHuman: numberOfHumans > 1,
+    logger,
+  });
   await engine.run();
 };
 
-main().catch(error => console.error(error));
+main().catch((error) => console.error(error));

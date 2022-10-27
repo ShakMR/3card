@@ -7,7 +7,7 @@ type HandProps = {
   canPlayMultiple?: boolean;
   returnOnFail?: boolean;
   priority: number;
-}
+};
 
 class Hand {
   private readonly _cards: Card[];
@@ -63,7 +63,7 @@ class Hand {
   }
 
   playCard(indexes: number[]) {
-    return indexes.reverse().map((index) => this._cards.splice(index, 1)[0])
+    return indexes.reverse().map((index) => this._cards.splice(index, 1)[0]);
   }
 
   isEmpty() {
@@ -71,7 +71,7 @@ class Hand {
   }
 
   toString() {
-    return this.visible ? this._cards.map(c => c.toString()) : 'X-X';
+    return this.visible ? this._cards.map((c) => c.toString()) : "X-X";
   }
 }
 

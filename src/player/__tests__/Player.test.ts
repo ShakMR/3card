@@ -7,98 +7,97 @@ import secretHand from "../../hand/SecretHand";
 import SecretHand from "../../hand/SecretHand";
 
 class TestPlayer extends Player {
-    constructor(public name: string, private playResult: unknown) {
-        super({name});
-    }
+  constructor(public name: string, private playResult: unknown) {
+    super({ name });
+  }
 
-    async play(): Promise<PlayerAction> {
-        return this.playResult as PlayerAction
-    }
+  async play(): Promise<PlayerAction> {
+    return this.playResult as PlayerAction;
+  }
 
-    typeOfPlayer: TypeOfPlayer = TypeOfPlayer.Bot;
+  typeOfPlayer: TypeOfPlayer = TypeOfPlayer.Bot;
 }
 
 class TestCard extends Card {
-    get suitSymbol(): string {
-        return "";
-    }
+  get suitSymbol(): string {
+    return "";
+  }
 
-    get symbol(): string | number {
-        return 0;
-    }
+  get symbol(): string | number {
+    return 0;
+  }
 }
 
 const addCardsToHand = (hand: Hand, howMany: number, suit: string) => {
-    for (let i = 0; i < howMany; i++) {
-        hand.addCard(new TestCard(i, suit));
-    }
-    return hand;
-}
-
+  for (let i = 0; i < howMany; i++) {
+    hand.addCard(new TestCard(i, suit));
+  }
+  return hand;
+};
 
 describe("Player", () => {
-    it ("Can create player", () => {
-        const player = new TestPlayer("test", {});
-        expect(player.name).toBe("test");
+  it("Can create player", () => {
+    const player = new TestPlayer("test", {});
+    expect(player.name).toBe("test");
+  });
+
+  it("Can set hands", () => {
+    const phand = addCardsToHand(new PlayerHand(), 3, "p");
+    const dhand = addCardsToHand(new DefenseHand(), 3, "d");
+    const shand = addCardsToHand(new secretHand(), 3, "s");
+    const player = new TestPlayer("hand", {});
+    expect(player.getAllHands()).toHaveLength(3);
+    expect(player.getAllHands()).toEqual([null, null, null]);
+    player.setHand(2, shand);
+    expect(player.getActiveHand()).toBeInstanceOf(SecretHand);
+    player.setHand(1, dhand);
+    expect(player.getActiveHand()).toBeInstanceOf(DefenseHand);
+    player.setHand(0, phand);
+    expect(player.getActiveHand()).toBeInstanceOf(PlayerHand);
+  });
+
+  describe("Can get cards", () => {
+    let player: Player;
+
+    beforeEach(() => {
+      const phand = addCardsToHand(new PlayerHand(), 3, "p");
+      const dhand = addCardsToHand(new DefenseHand(), 3, "d");
+      const shand = addCardsToHand(new secretHand(), 3, "s");
+      player = new TestPlayer("hand", {});
+
+      player.setHand(2, shand);
+      player.setHand(1, dhand);
+      player.setHand(0, phand);
     });
 
-    it("Can set hands", () => {
-        const phand = addCardsToHand(new PlayerHand(), 3, 'p');
-        const dhand = addCardsToHand(new DefenseHand(), 3, 'd');
-        const shand = addCardsToHand(new secretHand(), 3, 's');
-        const player = new TestPlayer("hand", {});
-        expect(player.getAllHands()).toHaveLength(3)
-        expect(player.getAllHands()).toEqual([null, null, null])
-        player.setHand(2, shand)
-        expect(player.getActiveHand()).toBeInstanceOf(SecretHand);
-        player.setHand(1, dhand)
-        expect(player.getActiveHand()).toBeInstanceOf(DefenseHand);
-        player.setHand(0, phand)
-        expect(player.getActiveHand()).toBeInstanceOf(PlayerHand);
-    })
+    it("from player hand when having cards there", () => {
+      const cards = player.getCards({ cardIndexes: [0, 1, 2] });
 
-    describe("Can get cards", () => {
-        let player: Player;
+      expect(cards).toHaveLength(3);
+      expect(cards.map((c) => c.suit)).toEqual(["p", "p", "p"]);
+    });
 
-        beforeEach(() => {
-            const phand = addCardsToHand(new PlayerHand(), 3, 'p');
-            const dhand = addCardsToHand(new DefenseHand(), 3, 'd');
-            const shand = addCardsToHand(new secretHand(), 3, 's');
-            player = new TestPlayer("hand", {});
+    it("from defense hand when no cards in player hand", () => {
+      player.setHand(0, new PlayerHand());
+      const cards = player.getCards({ cardIndexes: [0, 1, 2] });
 
-            player.setHand(2, shand)
-            player.setHand(1, dhand)
-            player.setHand(0, phand)
-        })
+      expect(cards).toHaveLength(3);
+      expect(cards.map((c) => c.suit)).toEqual(["d", "d", "d"]);
+    });
 
-        it("from player hand when having cards there", () => {
-            const cards = player.getCards({ cardIndexes: [0,1,2]});
+    it("from secret when no card in defense or player hand", () => {
+      player.setHand(1, new DefenseHand());
+      const cards = player.getCards({ cardIndexes: [0, 1, 2] });
 
-            expect(cards).toHaveLength(3);
-            expect(cards.map((c) => c.suit)).toEqual(['p','p','p'])
-        });
+      expect(cards).toHaveLength(3);
+      expect(cards.map((c) => c.suit)).toEqual(["s", "s", "s"]);
+    });
 
-        it("from defense hand when no cards in player hand", () => {
-            player.setHand(0, new PlayerHand());
-            const cards = player.getCards({ cardIndexes: [0,1,2]});
+    it("when not having card in secret", () => {
+      player.setHand(2, new SecretHand());
+      const cards = player.getCards({ cardIndexes: [0, 1, 2] });
 
-            expect(cards).toHaveLength(3);
-            expect(cards.map((c) => c.suit)).toEqual(['d','d','d'])
-        });
-
-        it("from secret when no card in defense or player hand", () => {
-            player.setHand(1, new DefenseHand());
-            const cards = player.getCards({ cardIndexes: [0,1,2]});
-
-            expect(cards).toHaveLength(3);
-            expect(cards.map((c) => c.suit)).toEqual(['s','s','s'])
-        });
-
-        it("when not having card in secret", () => {
-            player.setHand(2, new SecretHand());
-            const cards = player.getCards({ cardIndexes: [0,1,2]});
-
-            expect(cards).toHaveLength(3);
-        });
-    })
-})
+      expect(cards).toHaveLength(3);
+    });
+  });
+});

@@ -10,7 +10,7 @@ class Table {
 
   getStack() {
     while (this.gameStack[0] && this.gameStack[0].number === 3) {
-      const [card] = this.gameStack.splice(0,1);
+      const [card] = this.gameStack.splice(0, 1);
       this.discardStack.push(card);
     }
     return this.gameStack.splice(0);
@@ -26,7 +26,7 @@ class Table {
   }
 
   discardGameCards() {
-    this.discardStack.push(...this.gameStack)
+    this.discardStack.push(...this.gameStack);
     this.gameStack = [];
   }
 
