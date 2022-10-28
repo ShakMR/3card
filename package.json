@@ -10,7 +10,8 @@
     "start": "npm-run-all --parallel build:watch run:watch",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "run:watch": "nodemon dist/main.js --watch dist"
+    "run:watch": "nodemon dist/main.js --watch dist",
+    "run:batch": "node dist/batchGames.js"
   },
   "author": "",
   "license": "ISC",
@@ -27,9 +28,11 @@
     "unique-names-generator": "^4.7.1"
   },
   "dependencies": {
+    "@types/yargs": "^17.0.13",
     "eslint": "^8.26.0",
     "source-map-support": "^0.5.21",
     "typescript": "^4.8.4",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "yargs": "^17.6.0"
   }
 }

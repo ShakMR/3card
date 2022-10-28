@@ -48,11 +48,9 @@ describe("LinearComputerPlayer", () => {
                     seeNumberOfCards: () => undefined
                 }
 
-                const linearComputerPlayer = new LinearComputerPlayer(createLogger("test"));
+                const linearComputerPlayer = new LinearComputerPlayer(createLogger("test"), 0);
                 const hand = new PlayerHand();
                 hand.addCard(new TestCard(number, "s"));
-                // hand.addCard(new TestCard(10, "s"));
-                // hand.addCard(new TestCard(10, "s"));
                 linearComputerPlayer.setHand(0, hand);
 
                 const {action, data} = await linearComputerPlayer.play(1, table, players, cardRules, 0);

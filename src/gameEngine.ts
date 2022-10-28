@@ -14,6 +14,13 @@ import Display from "./display/Display";
 import { cardRules, tableRules } from "./game_rules/trix";
 import { ILogger } from "./logger/Logger";
 
+export class EndGame extends Error {
+  constructor(public turns: number, public winner: string) {
+    super(`${winner} wins in ${turns} turns`);
+  }
+
+}
+
 type GameEngineParams = {
   players: Player[];
   deck: Deck;
@@ -249,7 +256,7 @@ class GameEngine {
         break;
       case Resolutions.END:
         this.endGame();
-        return process.exit(0);
+        break;
       default:
         throw new Error(`Unreachable code ${resolution}`);
     }
@@ -314,6 +321,7 @@ class GameEngine {
   }
 
   private endGame() {
+    throw new EndGame(this.round, this.players[this.turn].name);
     this.display.endGame(this.players[this.turn]);
   }
 

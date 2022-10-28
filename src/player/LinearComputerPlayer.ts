@@ -8,7 +8,7 @@ import { USER_ACTIONS } from "../user_input/UserInput";
 import Card, { cardComparisonFunction } from "../card/Card";
 
 class LinearComputerPlayer extends Bot {
-  constructor(logger: ILogger) {
+  constructor(logger: ILogger, private waitingTime: number) {
     super(logger, "Linear");
   }
 
@@ -50,7 +50,7 @@ class LinearComputerPlayer extends Bot {
       };
     }
 
-    await this.think(500);
+    await this.think(this.waitingTime);
 
     const [...rest] = this.getActiveHand().cards;
 

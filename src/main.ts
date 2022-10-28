@@ -31,9 +31,9 @@ const createHumanPlayer = async (
 const createRandomComputerPlayer = async (): Promise<Bot> => {
   const whichBot = Math.floor(Math.random() * 2);
   if (whichBot === 0) {
-    return new RandomComputerPlayer(logger);
+    return new RandomComputerPlayer(logger, 500);
   } else {
-    return new LinearComputerPlayer(logger);
+    return new LinearComputerPlayer(logger, 500);
   }
 };
 

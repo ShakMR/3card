@@ -12,7 +12,7 @@ const getRandomPick = (array: number[]): number => {
 };
 
 class RandomComputerPlayer extends Bot {
-  constructor(logger: ILogger) {
+  constructor(logger: ILogger, private waitingTime: number) {
     super(logger, "Random");
   }
 
@@ -28,7 +28,7 @@ class RandomComputerPlayer extends Bot {
       };
     }
 
-    await this.think(500);
+    await this.think(this.waitingTime);
     const indexesToPlay = new Array<number>();
     const topCard = table.topCard();
     const activeHand = this.getActiveHand();

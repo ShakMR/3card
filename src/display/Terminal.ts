@@ -215,11 +215,14 @@ ${handCardsHorizontal({
 const tableDisplayFuncs = [null, onePlayerTable, twoPlayerTable];
 
 class Terminal extends Display {
-  constructor() {
+  constructor(private enabled: boolean = true) {
     super();
   }
 
   displayCurrentPlayerStatus(status: Status) {
+    if (!this.enabled) {
+      return
+    }
     const nPlayers = status.players.length;
 
     const nHumanPlayers = status.players.reduce(
@@ -236,6 +239,9 @@ class Terminal extends Display {
   }
 
   endGame(winner: Player) {
+    if (!this.enabled) {
+      return
+    }
     this.clear();
     console.log(
       Styles.blink,
@@ -245,6 +251,9 @@ class Terminal extends Display {
   }
 
   showMessage(messages: string[]) {
+    if (!this.enabled) {
+      return
+    }
     if (messages.length > 0) {
       messages.forEach((message) => {
         console.log(
@@ -255,6 +264,9 @@ class Terminal extends Display {
   }
 
   clear() {
+    if (!this.enabled) {
+      return
+    }
     console.clear();
   }
 }
