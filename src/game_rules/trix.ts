@@ -2,6 +2,7 @@ import PokerCard from "../card/PokerCard";
 import Table from "../table/Table";
 import { Resolutions } from "../resolutions";
 import Player from "../player/Player";
+import SecretHand from "../hand/SecretHand";
 
 export const afterXCanPlayAnyOf: Record<number, number[]> = {
   1: [1, 2, 3, 10],
@@ -141,8 +142,10 @@ export const tableRules = {
     const hand = player.getActiveHand();
     const topCard = table.topCard();
 
+    const isSecretHand = hand instanceof SecretHand;
     return (
       !topCard ||
+      isSecretHand ||
       hand.cards.some(
         (c) => c && cardRules.xCanBePlayedAfterY({ x: c, y: topCard })
       )

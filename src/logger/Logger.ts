@@ -1,5 +1,6 @@
 import path from "path";
 import winston, { format } from "winston";
+import * as os from "os";
 
 export const createLogger = (name: string, file = "logs") => {
   return winston.createLogger({
@@ -8,7 +9,7 @@ export const createLogger = (name: string, file = "logs") => {
     defaultMeta: { service: name },
     transports: [
       new winston.transports.File({
-        filename: path.join(__dirname, "..", "..", "logs", `${file}.log`),
+        filename: path.join(os.tmpdir(), `${file}.log`),
         options: { flags: "w" },
       }),
     ],
