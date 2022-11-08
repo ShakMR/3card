@@ -24,7 +24,7 @@ const createHumanPlayer = async (
   i: number,
   userInput: UserInput
 ): Promise<HumanPlayer> => {
-  const name = await utils.askUser(`Player ${i + 1} name?`);
+  const name = await utils.askUser(`Player name?`);
   return new HumanPlayer({ name, input: userInput });
 };
 
@@ -40,7 +40,8 @@ const createRandomComputerPlayer = async (): Promise<Bot> => {
 const main = async () => {
   const display = new Terminal();
   display.clear();
-  const nPlayers = await utils.askUserForNumber("N Players?", 1, 2);
+  display.startScreen();
+  const nPlayers = await utils.askUserForNumber("How many players in total?", 1, 2);
   const players = [];
   const userInput = new CommandLineInput();
   let numberOfHumans = 0;

@@ -58,7 +58,6 @@ abstract class Player {
   getActiveHand(): Hand {
     const hand = this.hands.find((h) => h && h.cards.length > 0);
     if (!hand) {
-      console.error(this.hands);
       throw new Error("Shouldn't be here. No active hand found");
     }
     return hand;

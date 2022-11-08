@@ -24,6 +24,8 @@ abstract class Display {
   abstract clear(): void;
 
   abstract endGame(winner: Player): void;
+
+  abstract startScreen(): void;
 }
 
 export default Display;

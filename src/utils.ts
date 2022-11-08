@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import {version} from '../package.json';
 import readline from "readline";
 
 const terminal = readline.createInterface({
@@ -21,8 +24,8 @@ const askUserForNumber = async (
   const q =
     rangeStart || rangeStart === 0
       ? `${question} [${rangeStart} - ${rangeEnds}] ${
-          optional ? "(optional)" : ""
-        }`
+        optional ? "(optional)" : ""
+      }`
       : question;
   let answer = parseInt(await askUser(q), 10);
   while (
@@ -30,7 +33,7 @@ const askUserForNumber = async (
     (isNaN(answer) ||
       (rangeStart && answer < rangeStart) ||
       (rangeEnds && answer > rangeEnds))
-  ) {
+    ) {
     answer = parseInt(await askUser(q), 10);
   }
   return answer;
@@ -39,4 +42,5 @@ const askUserForNumber = async (
 export default {
   askUser,
   askUserForNumber,
+  getAppVersion: () => version
 };
