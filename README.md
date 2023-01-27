@@ -19,3 +19,8 @@ There are 3 binaries you could run instead. They are in the `dist` folder, one f
 ## Build your own bot
 
 You could potentially build your own bot by creating a new bot class. They are in the `/src/players` folder. Just extend the Bot class and have fun.
+
+
+## Next steps
+
+I'm currently creating a game server so you connect to other players online and play one against each other. But that's been done [here](https://github.com/ShakMR/my-trix-server) and still not finished.
