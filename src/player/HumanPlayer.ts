@@ -1,14 +1,17 @@
 import Player, { PlayerAction, TypeOfPlayer } from "./Player";
-import UserInput, { USER_ACTIONS } from "../user_input/UserInput";
-import terminal from "../utils";
+import UserInput from "../user_input/UserInput";
+import type { Menu } from "../menu/menu";
+import { USER_ACTIONS } from "../types";
 
 class HumanPlayer extends Player {
   input: UserInput;
+  menu: Menu;
   typeOfPlayer: TypeOfPlayer = TypeOfPlayer.Human;
 
-  constructor({ name, input }: { name: string; input: UserInput }) {
+  constructor({ name, menu, input }: { name: string, menu: Menu; input: UserInput }) {
     super({ name });
     this.input = input;
+    this.menu = menu;
   }
 
   private async selectCards(
@@ -26,12 +29,14 @@ class HumanPlayer extends Player {
 
     if (cards.length === 0) {
       return {
-        action: "Error",
+        action: USER_ACTIONS.NP,
+        error: true,
       };
     }
     if (cards.length > 1) {
-      const answer = await terminal.askUserForNumber(
-        `There are ${cards.length} card with number ${cardNumberStr}, how many do you want to play?`
+      const answer = await this.input.askUserForNumber(
+        `There are ${cards.length} card with number ${cardNumberStr}, how many do you want to play?`,
+        {}
       );
       cards = cards.slice(0, answer);
     }
@@ -54,9 +59,9 @@ class HumanPlayer extends Player {
   }
 
   private async selectExchange() {
-    const card1Index = await this.input.getExchangeForPosition(0);
-    const card2Index = await this.input.getExchangeForPosition(1);
-    const card3Index = await this.input.getExchangeForPosition(2);
+    const card1Index = (await this.menu.askForInitialCardExchange(0)).second;
+    const card2Index = (await this.menu.askForInitialCardExchange(1)).second;
+    const card3Index = (await this.menu.askForInitialCardExchange(2)).second;
 
     return [card1Index, card2Index, card3Index];
   }
@@ -76,7 +81,7 @@ class HumanPlayer extends Player {
       // loop until one action has been taken
       let order;
       while (!order) {
-        order = await this.input.getOrder(this.name, shouldSelectByIndex);
+        order = await this.menu.askForTurnAction(this, shouldSelectByIndex);
       }
 
       switch (order) {
@@ -92,11 +97,11 @@ class HumanPlayer extends Player {
           };
         default:
           // eslint-disable-next-line no-case-declarations
-          const { action, data } = await this.selectCards(
+          const { action, data, error } = await this.selectCards(
             order,
             shouldSelectByIndex
           );
-          if (action !== "Error") {
+          if (!error) {
             return {
               action,
               data,

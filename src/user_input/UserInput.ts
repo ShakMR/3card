@@ -1,20 +1,19 @@
-export enum USER_ACTIONS {
-  PLAY_CARDS = "play",
-  DISCARD_CARDS = "discard",
-  GET_ALL = "getall",
-  WHAT_TO_PLAY = "whatToPlay",
-  SORT_HAND = "sortHand",
-  EXCHANGE = "exchange",
-  NP = "np",
-}
+export type RangeQuestionOptions = {
+  rangeStart?: number;
+  rangeEnd?: number;
+  optional?: boolean;
+  showRange?: boolean;
+};
 
-abstract class UserInput {
-  abstract getOrder(
-    name: string,
-    shouldSelectByIndex: boolean
-  ): Promise<USER_ACTIONS | string>;
+interface UserInput {
+  askUser(question: string): Promise<string>;
 
-  abstract getExchangeForPosition(position: number): Promise<number>;
+  askUserForNumber(
+    question: string,
+    options: RangeQuestionOptions
+  ): Promise<number>;
+
+  askForOptions(options: string[], customQuestion?: string): Promise<string>;
 }
 
 export default UserInput;

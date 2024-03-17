@@ -1,22 +1,24 @@
-import { USER_ACTIONS } from "./user_input/UserInput";
-
 import { Resolutions } from "./resolutions";
 import createVisiblePlayers from "./player/visiblePlayers";
 import createVisibleTable from "./table/visibleTable";
-
-import terminal from "./utils";
 
 import HANDS_CONFIG, { HandConfig } from "./hand/config";
 import Deck from "./deck/Deck";
 import Player from "./player/Player";
 import Table from "./table/Table";
-import Display from "./display/Display";
+import type Display from "./display/Display";
 import { cardRules, tableRules } from "./game_rules/trix";
-import { ILogger } from "./logger/Logger";
+import { createLogger, ILogger } from "./logger/Logger";
+import { USER_ACTIONS } from "./types";
+import type { Menu } from "./menu/menu";
+import PlayerHand from "./hand/PlayerHand";
+import DefenseHand from "./hand/DefenseHand";
+import SecretHand from "./hand/SecretHand";
 
 export class EndGame extends Error {
   constructor(public turns: number, public winner: string) {
     super(`${winner} wins in ${turns} turns`);
+    process.exit(0);
   }
 
 }
@@ -27,7 +29,8 @@ type GameEngineParams = {
   table: Table;
   display: Display;
   moreThanOneHuman: boolean;
-  logger: ILogger;
+  logger?: ILogger;
+  menu: Menu;
 };
 
 class GameEngine {
@@ -35,6 +38,7 @@ class GameEngine {
   turn = 0;
   deck: Deck;
   table: Table;
+  menu: Menu;
   display: Display;
   message: string[] = [];
   moreThanOneHuman: boolean;
@@ -47,7 +51,8 @@ class GameEngine {
     table,
     display,
     moreThanOneHuman,
-    logger,
+    logger = createLogger("GameEngine"),
+    menu,
   }: GameEngineParams) {
     this.players = players;
     this.deck = deck;
@@ -55,6 +60,15 @@ class GameEngine {
     this.display = display;
     this.moreThanOneHuman = moreThanOneHuman;
     this.logger = logger;
+    this.menu = menu;
+  }
+
+  init() {
+    for (const player of this.players) {
+      player.setHand(HANDS_CONFIG.PLAYER.priority, new PlayerHand());
+      player.setHand(HANDS_CONFIG.DEFENSE.priority, new DefenseHand());
+      player.setHand(HANDS_CONFIG.SECRET.priority, new SecretHand());
+    }
   }
 
   private dealHands(handConfig: HandConfig) {
@@ -75,7 +89,9 @@ class GameEngine {
     this.turn = 0;
   }
 
-  async run() {
+  private async setUpTable() {
+    this.deck.shuffle();
+
     // dealing secret
     this.dealHands(HANDS_CONFIG.SECRET);
     this.dealHands(HANDS_CONFIG.DEFENSE);
@@ -84,6 +100,10 @@ class GameEngine {
     this.showStatus();
 
     await this.firstTurnExchange();
+  }
+
+  async run() {
+    await this.setUpTable();
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
@@ -133,7 +153,7 @@ class GameEngine {
           this.discardCards(currentPlayer, data!.cardIndexes!);
           break;
         default:
-          this.logger.error(`Unkown user action ${action}`);
+          this.logger.error(`Unknown user action ${action}`);
           this.addMessage(`Unknown user action ${action}`);
       }
     }
@@ -185,12 +205,13 @@ class GameEngine {
         this.table.discardCardsFromStack(cardsToDiscard);
       }
 
-      if (player.hasFinished()) {
-        return Resolutions.END;
-      }
 
       if (playCards) {
         this.table.playCards(cards);
+      }
+
+      if (player.hasFinished()) {
+        return Resolutions.END;
       }
     }
 
@@ -299,7 +320,7 @@ class GameEngine {
 
   private async waitForUser() {
     if (this.moreThanOneHuman) {
-      await terminal.askUser("Press ENTER to continue");
+      await this.menu.askUserToContinue();
     }
   }
 
@@ -321,8 +342,8 @@ class GameEngine {
   }
 
   private endGame() {
-    throw new EndGame(this.round, this.players[this.turn].name);
     this.display.endGame(this.players[this.turn]);
+    throw new EndGame(this.round, this.players[this.turn].name);
   }
 
   private async firstTurnExchange() {

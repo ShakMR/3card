@@ -46,7 +46,7 @@ abstract class Bot extends Player {
         });
     };
 
-    protected constructor(protected logger: ILogger, namePrefix: string) {
+    protected constructor(namePrefix: string, protected logger: ILogger) {
         const name = uniqueNamesGenerator({
             dictionaries: [adjectives, matrixNames],
             style: "capital",

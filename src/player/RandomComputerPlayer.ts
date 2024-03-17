@@ -2,9 +2,9 @@ import { PlayerAction } from "./Player";
 import { VisibleTable } from "../table/visibleTable";
 import { VisiblePlayers } from "./visiblePlayers";
 import { CardRules } from "../game_rules/trix";
-import { USER_ACTIONS } from "../user_input/UserInput";
-import { ILogger } from "../logger/Logger";
+import { createLogger, ILogger } from "../logger/Logger";
 import Bot from "./Bot";
+import { USER_ACTIONS } from "../types";
 
 const getRandomPick = (array: number[]): number => {
   const pick = Math.floor(Math.random() * array.length);
@@ -12,8 +12,8 @@ const getRandomPick = (array: number[]): number => {
 };
 
 class RandomComputerPlayer extends Bot {
-  constructor(logger: ILogger, private waitingTime: number) {
-    super(logger, "Random");
+  constructor(private waitingTime: number, logger: ILogger = createLogger("Random Bot")) {
+    super("Random", logger);
   }
 
   async play(

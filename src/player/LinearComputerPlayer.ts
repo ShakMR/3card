@@ -1,15 +1,15 @@
-import { ILogger } from "../logger/Logger";
+import { createLogger, ILogger } from "../logger/Logger";
 import Bot from "./Bot";
 import { VisibleTable } from "../table/visibleTable";
 import { VisiblePlayers } from "./visiblePlayers";
 import { CardRules } from "../game_rules/trix";
 import { PlayerAction } from "./Player";
-import { USER_ACTIONS } from "../user_input/UserInput";
 import Card, { cardComparisonFunction } from "../card/Card";
+import { USER_ACTIONS } from "../types";
 
 class LinearComputerPlayer extends Bot {
-  constructor(logger: ILogger, private waitingTime: number) {
-    super(logger, "Linear");
+  constructor(private waitingTime: number, logger: ILogger = createLogger("Linear Bot")) {
+    super("Linear", logger);
   }
 
   private exchangeCards(cardRules: CardRules): (number | null)[] {

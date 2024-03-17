@@ -40,7 +40,11 @@ class Deck {
       });
     });
 
-    this.cards = shuffle(tempDeck);
+    this.cards = tempDeck;
+  }
+
+  shuffle() {
+    this.cards = shuffle(this.cards);
   }
 
   pickCard() {

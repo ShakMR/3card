@@ -12,6 +12,8 @@ import PlayerHand from "./hand/PlayerHand";
 import DefenseHand from "./hand/DefenseHand";
 import SecretHand from "./hand/SecretHand";
 import Bot from "./player/Bot";
+import { ConsoleMenu } from "./menu/ConsoleMenu";
+import CommandLineInput from "./user_input/CommandLineInput";
 
 const options: Record<string, Options> = {
   games: {
@@ -77,8 +79,8 @@ const runGame = async (shoulDisplay: boolean, waitingTime: number) => {
 
     const players = [];
     if (args._[0] === "rvl") {
-      players.push(addHands(new RandomComputerPlayer(botsLoggers, waitingTime)));
-      players.push(addHands(new LinearComputerPlayer(botsLoggers, waitingTime)));
+      players.push(addHands(new RandomComputerPlayer(waitingTime)));
+      players.push(addHands(new LinearComputerPlayer(waitingTime)));
     }
 
     const deck = new PokerDeck();
@@ -91,6 +93,7 @@ const runGame = async (shoulDisplay: boolean, waitingTime: number) => {
         display,
         moreThanOneHuman: false,
         logger: botsLoggers,
+        menu: new ConsoleMenu(display, new CommandLineInput()),
     });
     try {
       await engine.run();

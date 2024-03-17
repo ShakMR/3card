@@ -2,7 +2,6 @@ import Display, { Status } from "./Display";
 import Card from "../card/Card";
 import Player, { TypeOfPlayer } from "../player/Player";
 import Hand from "../hand/Hand";
-import utils from "../utils";
 
 enum Styles {
   reset = "\x1b[0m",
@@ -214,9 +213,8 @@ ${handCardsHorizontal({
 
 const tableDisplayFuncs = [null, onePlayerTable, twoPlayerTable];
 
-class Terminal extends Display {
+class Terminal implements Display {
   constructor(private enabled: boolean = true) {
-    super();
   }
 
   displayCurrentPlayerStatus(status: Status) {
@@ -263,41 +261,15 @@ class Terminal extends Display {
     }
   }
 
+  show(plainText: string) {
+    console.log(plainText);
+  }
+
   clear() {
     if (!this.enabled) {
       return
     }
     console.clear();
-  }
-
-  startScreen() {
-    console.log(`
- _    _        _                               
-| |  | |      | |                              
-| |  | |  ___ | |  ___   ___   _ __ ___    ___ 
-| |/\\| | / _ \\| | / __| / _ \\ | '_ \` _ \\  / _ \\
-\\  /\\  /|  __/| || (__ | (_) || | | | | ||  __/
- \\/  \\/  \\___||_| \\___| \\___/ |_| |_| |_| \\___|
-                                               
-                                               
-               _____  _____                    
-              |_   _||  _  |                   
-                | |  | | | |                   
-                | |  | | | |                   
-                | |  \\ \\_/ /                   
-                \\_/   \\___/                    
-                                               
-                                               
-        _____ ______  _____ __   __            
-       |_   _|| ___ \\|_   _|\\ \\ / /            
-         | |  | |_/ /  | |   \\ V /             
-         | |  |    /   | |   /   \\             
-         | |  | |\\ \\  _| |_ / /^\\ \\            
-         \\_/  \\_| \\_| \\___/ \\/   \\/ v: ${utils.getAppVersion()}
-                                  
-                                            By ShakMR
-                      https://github.com/shakmr/3card
-    `)
   }
 }
 

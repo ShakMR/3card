@@ -1,11 +1,10 @@
 import { VisibleTable } from "../../table/visibleTable";
 import Card from "../../card/Card";
 import LinearComputerPlayer from "../LinearComputerPlayer";
-import { createLogger } from "../../logger/Logger";
 import { VisiblePlayers } from "../visiblePlayers";
 import { cardRules, CardRules } from "../../game_rules/trix";
 import PlayerHand from "../../hand/PlayerHand";
-import { USER_ACTIONS } from "../../user_input/UserInput";
+import { USER_ACTIONS } from "../../types";
 
 class TestCard extends Card {
     get suitSymbol(): string {
@@ -48,7 +47,7 @@ describe("LinearComputerPlayer", () => {
                     seeNumberOfCards: () => undefined
                 }
 
-                const linearComputerPlayer = new LinearComputerPlayer(createLogger("test"), 0);
+                const linearComputerPlayer = new LinearComputerPlayer(0);
                 const hand = new PlayerHand();
                 hand.addCard(new TestCard(number, "s"));
                 linearComputerPlayer.setHand(0, hand);

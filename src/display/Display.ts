@@ -10,8 +10,8 @@ export type Status = {
   hidden: boolean;
 };
 
-abstract class Display {
-  abstract displayCurrentPlayerStatus({
+interface Display {
+  displayCurrentPlayerStatus({
     turn,
     players,
     table,
@@ -19,13 +19,13 @@ abstract class Display {
     hidden,
   }: Status): void;
 
-  abstract showMessage(messages: string[]): void;
+  showMessage(messages: string[]): void;
 
-  abstract clear(): void;
+  show(plainText: string): void;
 
-  abstract endGame(winner: Player): void;
+  clear(): void;
 
-  abstract startScreen(): void;
+  endGame(winner: Player): void;
 }
 
 export default Display;

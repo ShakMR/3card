@@ -3,13 +3,14 @@ import SecretHand from "../hand/SecretHand";
 import PlayerHand from "../hand/PlayerHand";
 import Hand from "../hand/Hand";
 import Card from "../card/Card";
-import { USER_ACTIONS } from "../user_input/UserInput";
 import { CardRules } from "../game_rules/trix";
 import { VisiblePlayers } from "./visiblePlayers";
 import { VisibleTable } from "../table/visibleTable";
+import type { USER_ACTIONS } from "../types";
 
 export type PlayerAction = {
-  action: USER_ACTIONS | "Error";
+  action: USER_ACTIONS;
+  error?: boolean;
   data?: {
     cardIndexes?: number[];
     exchange?: (number | null)[];
