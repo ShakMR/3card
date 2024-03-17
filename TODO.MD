@@ -6,3 +6,5 @@ This list might not shrink but grow over time instead :D
 - [x] Move all game rules out of Game objects (Card, Deck, etc)
 - [x] Implement simple IA
 - [x] Implement first turn Defense and Player hands exchange.
+- [ ] Create Client
+- [ ] Implement Online game engine
