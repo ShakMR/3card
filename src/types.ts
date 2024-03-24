@@ -1,4 +1,4 @@
-import type Player from "./player/Player";
+import type Player from "./game/trix/domain/player/Player";
 
 export enum GameType {
   local,

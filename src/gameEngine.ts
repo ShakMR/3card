@@ -1,26 +1,23 @@
 import { Resolutions } from "./resolutions";
-import createVisiblePlayers from "./player/visiblePlayers";
-import createVisibleTable from "./table/visibleTable";
+import createVisibleTable from "./domain/table/visibleTable";
+import createVisiblePlayers from "./game/trix/domain/player/visiblePlayers";
 
-import HANDS_CONFIG, { HandConfig } from "./hand/config";
-import Deck from "./deck/Deck";
-import Player from "./player/Player";
-import Table from "./table/Table";
-import type Display from "./display/Display";
-import { cardRules, tableRules } from "./game_rules/trix";
-import { createLogger, ILogger } from "./logger/Logger";
+import Deck from "./domain/deck/Deck";
+import Table from "./domain/table/Table";
+import type Display from "./IO/display/Display";
+import { createLogger, type ILogger } from "./logger/Logger";
 import { USER_ACTIONS } from "./types";
-import type { Menu } from "./menu/menu";
-import PlayerHand from "./hand/PlayerHand";
-import DefenseHand from "./hand/DefenseHand";
-import SecretHand from "./hand/SecretHand";
+import type { Menu } from "./game/trix/menu/menu";
+import type { HandConfig } from "./game/trix/domain/hand/config";
+import  Player from "./game/trix/domain/player/Player";
+import { cardRules, tableRules } from "./game/trix/rules";
+import { DefenseHand, PlayerHand, SecretHand, HandConfigs } from "./game/trix/domain/hand";
 
 export class EndGame extends Error {
   constructor(public turns: number, public winner: string) {
     super(`${winner} wins in ${turns} turns`);
     process.exit(0);
   }
-
 }
 
 type GameEngineParams = {
@@ -46,14 +43,14 @@ class GameEngine {
   round = 0;
 
   constructor({
-    players,
-    deck,
-    table,
-    display,
-    moreThanOneHuman,
-    logger = createLogger("GameEngine"),
-    menu,
-  }: GameEngineParams) {
+                players,
+                deck,
+                table,
+                display,
+                moreThanOneHuman,
+                logger = createLogger("GameEngine"),
+                menu
+              }: GameEngineParams) {
     this.players = players;
     this.deck = deck;
     this.table = table;
@@ -65,9 +62,9 @@ class GameEngine {
 
   init() {
     for (const player of this.players) {
-      player.setHand(HANDS_CONFIG.PLAYER.priority, new PlayerHand());
-      player.setHand(HANDS_CONFIG.DEFENSE.priority, new DefenseHand());
-      player.setHand(HANDS_CONFIG.SECRET.priority, new SecretHand());
+      player.setHand(HandConfigs.PLAYER.priority, new PlayerHand());
+      player.setHand(HandConfigs.DEFENSE.priority, new DefenseHand());
+      player.setHand(HandConfigs.SECRET.priority, new SecretHand());
     }
   }
 
@@ -93,9 +90,9 @@ class GameEngine {
     this.deck.shuffle();
 
     // dealing secret
-    this.dealHands(HANDS_CONFIG.SECRET);
-    this.dealHands(HANDS_CONFIG.DEFENSE);
-    this.dealHands(HANDS_CONFIG.PLAYER);
+    this.dealHands(HandConfigs.SECRET);
+    this.dealHands(HandConfigs.DEFENSE);
+    this.dealHands(HandConfigs.PLAYER);
 
     this.showStatus();
 
@@ -110,21 +107,26 @@ class GameEngine {
       this.round++;
       this.showStatus();
       const currentPlayer = this.players[this.turn];
-      if (!tableRules.canPlaySomething(this.table, currentPlayer)) {
-        await this.cannotPlay(currentPlayer);
-      } else {
-        const resolution = await this.playTurn(currentPlayer);
-        this.nextPlayer(resolution);
-        this.showStatus({ hidden: true });
-        await this.waitForUser();
-      }
+      await this.playerTurn(currentPlayer);
+      await this.waitForUser();
     }
+  }
+
+  private async playerTurn(currentPlayer: Player) {
+    if (!tableRules.canPlaySomething(this.table, currentPlayer)) {
+      return this.cannotPlay(currentPlayer);
+    }
+
+    const resolution = await this.playTurn(currentPlayer);
+    this.nextPlayer(resolution);
+    this.showStatus({ hidden: true });
   }
 
   private async playTurn(currentPlayer: Player) {
     let resolution;
     const visibleTable = createVisibleTable(this.table);
     const visiblePlayers = createVisiblePlayers(this.players, this.turn);
+
     while (!resolution) {
       const { action, data } = await currentPlayer.play(
         this.round,
@@ -166,6 +168,7 @@ class GameEngine {
   ): Promise<Resolutions> {
     this.logger.info(cardIndexes);
     const cards = player.getCards({ cardIndexes });
+
     if (!cards) {
       this.logger.error(
         `Unreachable code, invalid card indexes: ${cardIndexes}`
@@ -178,6 +181,7 @@ class GameEngine {
       this.table,
       cards
     );
+
     if (resolution === Resolutions.NOPE) {
       this.logger.warn(`Cannot play that card, ${cards}`);
       this.addMessage("You cannot play that card");
@@ -204,7 +208,6 @@ class GameEngine {
       if (cardsToDiscard && cardsToDiscard > 0) {
         this.table.discardCardsFromStack(cardsToDiscard);
       }
-
 
       if (playCards) {
         this.table.playCards(cards);
@@ -292,7 +295,7 @@ class GameEngine {
     }
     const card = this.deck.pickCard();
     if (card) {
-      this.players[this.turn].addCard(card, HANDS_CONFIG.PLAYER.priority);
+      this.players[this.turn].addCard(card, HandConfigs.PLAYER.priority);
     }
     this.drawCardPlayer();
   }
@@ -304,7 +307,7 @@ class GameEngine {
       players: this.players,
       table: this.table,
       deck: this.deck,
-      hidden,
+      hidden
     });
     this.display.showMessage(this.message);
     this.message = [];
@@ -342,12 +345,14 @@ class GameEngine {
   }
 
   private endGame() {
+    this.showStatus();
     this.display.endGame(this.players[this.turn]);
     throw new EndGame(this.round, this.players[this.turn].name);
   }
 
   private async firstTurnExchange() {
     for (const [index, player] of this.players.entries()) {
+      // this shouldn't call play but an special function for exchange
       const { action, data } = await player.play(
         0,
         createVisibleTable(this.table),

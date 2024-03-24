@@ -1,19 +1,16 @@
 import { hideBin } from "yargs/helpers";
-import yargs, { Argv, Options } from "yargs";
+import yargs, { Options } from "yargs";
 import { createLogger } from "./logger/Logger";
-import Terminal from "./display/Terminal";
-import PokerDeck from "./deck/PokerDeck";
+import Terminal from "./game/trix/display/terminal/Terminal";
+import PokerDeck from "./domain/deck/PokerDeck";
 import GameEngine, { EndGame } from "./gameEngine";
-import RandomComputerPlayer from "./player/RandomComputerPlayer";
-import LinearComputerPlayer from "./player/LinearComputerPlayer";
-import Table from "./table/Table";
-import HANDS_CONFIG from "./hand/config";
-import PlayerHand from "./hand/PlayerHand";
-import DefenseHand from "./hand/DefenseHand";
-import SecretHand from "./hand/SecretHand";
-import Bot from "./player/Bot";
-import { ConsoleMenu } from "./menu/ConsoleMenu";
-import CommandLineInput from "./user_input/CommandLineInput";
+import Table from "./domain/table/Table";
+import { ConsoleMenu } from "./game/trix/menu/ConsoleMenu";
+import CommandLineInput from "./IO/user_input/CommandLineInput";
+import RandomComputerPlayer from "./game/trix/domain/player/RandomComputerPlayer";
+import LinearComputerPlayer from "./game/trix/domain/player/LinearComputerPlayer";
+import type Bot from "./game/trix/domain/player/Bot";
+import { DefenseHand, HandConfigs, PlayerHand, SecretHand } from "./game/trix/domain/hand";
 
 const options: Record<string, Options> = {
   games: {
@@ -65,9 +62,9 @@ const args = yargs(hideBin(process.argv))
   .parseSync() as unknown as Arguments;
 
 const addHands = (p: Bot) => {
-    p.setHand(HANDS_CONFIG.PLAYER.priority, new PlayerHand());
-    p.setHand(HANDS_CONFIG.DEFENSE.priority, new DefenseHand());
-    p.setHand(HANDS_CONFIG.SECRET.priority, new SecretHand());
+    p.setHand(HandConfigs.PLAYER.priority, new PlayerHand());
+    p.setHand(HandConfigs.DEFENSE.priority, new DefenseHand());
+    p.setHand(HandConfigs.SECRET.priority, new SecretHand());
     return p;
 }
 

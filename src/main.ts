@@ -1,10 +1,10 @@
 import sourceMapSupport from "source-map-support";
 import GameEngine from "./gameEngine";
-import Table from "./table/Table";
-import Terminal from "./display/Terminal";
-import CommandLineInput from "./user_input/CommandLineInput";
-import PokerDeck from "./deck/PokerDeck";
-import { ConsoleMenu } from "./menu/ConsoleMenu";
+import Table from "./domain/table/Table";
+import Terminal from "./game/trix/display/terminal/Terminal";
+import CommandLineInput from "./IO/user_input/CommandLineInput";
+import PokerDeck from "./domain/deck/PokerDeck";
+import { ConsoleMenu } from "./game/trix/menu/ConsoleMenu";
 import { GameType } from "./types";
 
 sourceMapSupport.install();
